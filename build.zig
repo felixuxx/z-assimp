@@ -32,9 +32,9 @@ pub fn build(b: *std.Build) !void {
         lib.root_module.addCMacro("OPENDDL_STATIC_LIBARY", "");
     }
 
-    lib.linkLibC();
+    lib.root_module.link_libc = true;
     if (target.result.abi != .msvc) {
-        lib.linkLibCpp();
+        lib.root_module.link_libcpp = true;
     }
 
     const config_h = b.addConfigHeader(
@@ -152,10 +152,10 @@ pub fn build(b: *std.Build) !void {
         .files = &[_][]const u8{"src/example.cpp"},
         .flags = &[_][]const u8{"-std=c++17"},
     });
-    example_cpp.linkLibrary(lib);
-    example_cpp.linkLibC();
+    example_cpp.root_module.linkLibrary(lib);
+    example_cpp.root_module.link_libc = true;
     if (target.result.abi != .msvc) {
-        example_cpp.linkLibCpp();
+        example_cpp.root_module.link_libcpp = true;
     }
     example_cpp.root_module.addIncludePath(assimp.path("include"));
     if (target.result.os.tag == .windows) {
@@ -175,8 +175,8 @@ pub fn build(b: *std.Build) !void {
         .files = &[_][]const u8{"src/example.c"},
         .flags = &[_][]const u8{"-std=c99"},
     });
-    example_c.linkLibrary(lib);
-    example_c.linkLibC();
+    example_c.root_module.linkLibrary(lib);
+    example_c.root_module.link_libc = true;
     example_c.root_module.addIncludePath(assimp.path("include"));
     if (target.result.os.tag == .windows) {
         example_c.root_module.addCMacro("_WINDOWS", "");

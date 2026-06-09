@@ -10,7 +10,7 @@
         "include",
         "src",
     },
-    .minimum_zig_version = "0.15.1",
+    .minimum_zig_version = "0.16.0",
     .dependencies = .{
         .assimp = .{
             .url = "https://github.com/assimp/assimp/archive/v5.3.1.tar.gz",
