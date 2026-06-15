@@ -386,7 +386,7 @@ pub fn getMaterialTextureCount(mat: *const types.aiMaterial, type_: types.aiText
     return c.aiGetMaterialTextureCount(mat, type_);
 }
 
-pub fn getMaterialTexture(mat: *const types.aiMaterial, type_: types.aiTextureType, index: c_uint, path: *types.aiString, mapping: ?*types.aiTextureMapping, uvindex: ?*c_uint, blend: ?*types.ai_real, op: ?*types.aiTextureOp, mapmode: ?*types.aiTextureMapMode, flags: ?*c_uint) types.aiReturn {
+pub fn getMaterialTexture(mat: *const types.aiMaterial, type_: types.aiTextureType, index: c_uint, path: *types.aiString, mapping: ?*types.aiTextureMapping, uvindex: ?*c_uint, blend: ?*types.ai_real, op: ?*types.aiTextureOp, mapmode: ?[*]types.aiTextureMapMode, flags: ?*c_uint) types.aiReturn {
     return c.aiGetMaterialTexture(mat, type_, index, path, mapping, uvindex, blend, op, mapmode, flags);
 }
 
@@ -503,6 +503,80 @@ pub fn meshFaces(mesh: *const types.aiMesh) ?[]const types.aiFace {
 pub fn meshBones(mesh: *const types.aiMesh) []const *const types.aiBone {
     if (mesh.mBones) |ptr| return ptr[0..mesh.mNumBones];
     return &[_]*const types.aiBone{};
+}
+
+pub const MaterialTextureInfo = extern struct {
+    path: types.aiString,
+    mapping: types.aiTextureMapping,
+    uvindex: c_uint,
+    blend: types.ai_real,
+    op: types.aiTextureOp,
+    mapmode_u: types.aiTextureMapMode,
+    mapmode_v: types.aiTextureMapMode,
+    flags: c_uint,
+};
+
+pub fn materialGetFloat(mat: *const types.aiMaterial, key: [:0]const u8, type_: c_uint, index: c_uint) ?types.ai_real {
+    var out: types.ai_real = undefined;
+    return switch (c.aiGetMaterialFloatArray(mat, key.ptr, type_, index, &out, null)) {
+        .SUCCESS => out,
+        else => null,
+    };
+}
+
+pub fn materialGetInteger(mat: *const types.aiMaterial, key: [:0]const u8, type_: c_uint, index: c_uint) ?c_int {
+    var out: c_int = undefined;
+    return switch (c.aiGetMaterialIntegerArray(mat, key.ptr, type_, index, &out, null)) {
+        .SUCCESS => out,
+        else => null,
+    };
+}
+
+pub fn materialGetColor(mat: *const types.aiMaterial, key: [:0]const u8, type_: c_uint, index: c_uint) ?types.aiColor4D {
+    var out: types.aiColor4D = undefined;
+    return switch (c.aiGetMaterialColor(mat, key.ptr, type_, index, &out)) {
+        .SUCCESS => out,
+        else => null,
+    };
+}
+
+pub fn materialGetString(mat: *const types.aiMaterial, key: [:0]const u8, type_: c_uint, index: c_uint) ?types.aiString {
+    var out: types.aiString = undefined;
+    return switch (c.aiGetMaterialString(mat, key.ptr, type_, index, &out)) {
+        .SUCCESS => out,
+        else => null,
+    };
+}
+
+pub fn materialGetUVTransform(mat: *const types.aiMaterial, key: [:0]const u8, type_: c_uint, index: c_uint) ?types.aiUVTransform {
+    var out: types.aiUVTransform = undefined;
+    return switch (c.aiGetMaterialUVTransform(mat, key.ptr, type_, index, &out)) {
+        .SUCCESS => out,
+        else => null,
+    };
+}
+
+pub fn materialGetTextureInfo(mat: *const types.aiMaterial, type_: types.aiTextureType, index: c_uint) ?MaterialTextureInfo {
+    var path: types.aiString = undefined;
+    var mapping: types.aiTextureMapping = undefined;
+    var uvindex: c_uint = undefined;
+    var blend: types.ai_real = undefined;
+    var op: types.aiTextureOp = undefined;
+    var mapmode: [2]types.aiTextureMapMode = undefined;
+    var flags: c_uint = undefined;
+    return switch (c.aiGetMaterialTexture(mat, type_, index, &path, &mapping, &uvindex, &blend, &op, &mapmode, &flags)) {
+        .SUCCESS => MaterialTextureInfo{
+            .path = path,
+            .mapping = mapping,
+            .uvindex = uvindex,
+            .blend = blend,
+            .op = op,
+            .mapmode_u = mapmode[0],
+            .mapmode_v = mapmode[1],
+            .flags = flags,
+        },
+        else => null,
+    };
 }
 
 const std = @import("std");

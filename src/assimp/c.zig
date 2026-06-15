@@ -170,7 +170,7 @@ pub extern "c" fn aiGetMaterialColor(pMat: *const aiMaterial, pKey: [*:0]const u
 pub extern "c" fn aiGetMaterialUVTransform(pMat: *const aiMaterial, pKey: [*:0]const u8, type_: c_uint, index: c_uint, pOut: *types.aiUVTransform) aiReturn;
 pub extern "c" fn aiGetMaterialString(pMat: *const aiMaterial, pKey: [*:0]const u8, type_: c_uint, index: c_uint, pOut: *aiString) aiReturn;
 pub extern "c" fn aiGetMaterialTextureCount(pMat: *const aiMaterial, type_: aiTextureType) c_uint;
-pub extern "c" fn aiGetMaterialTexture(pMat: *const aiMaterial, type_: aiTextureType, index: c_uint, path: *aiString, mapping: ?*types.aiTextureMapping, uvindex: ?*c_uint, blend: ?*aiReal, op: ?*types.aiTextureOp, mapmode: ?*types.aiTextureMapMode, flags: ?*c_uint) aiReturn;
+pub extern "c" fn aiGetMaterialTexture(pMat: *const aiMaterial, type_: aiTextureType, index: c_uint, path: *aiString, mapping: ?*types.aiTextureMapping, uvindex: ?*c_uint, blend: ?*aiReal, op: ?*types.aiTextureOp, mapmode: ?[*]types.aiTextureMapMode, flags: ?*c_uint) aiReturn;
 pub extern "c" fn aiTextureTypeToString(in_: aiTextureType) [*:0]const u8;
 
 pub extern "c" fn aiGetImporterDesc(extension: [*:0]const u8) ?*const aiImporterDesc;
