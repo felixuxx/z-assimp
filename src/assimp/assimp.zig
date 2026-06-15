@@ -463,4 +463,46 @@ pub fn nodeIsRoot(node: *const types.aiNode) bool {
     return node.mParent == null;
 }
 
+pub fn meshVertices(mesh: *const types.aiMesh) ?[]const types.aiVector3D {
+    const ptr = mesh.mVertices orelse return null;
+    return ptr[0..mesh.mNumVertices];
+}
+
+pub fn meshNormals(mesh: *const types.aiMesh) ?[]const types.aiVector3D {
+    const ptr = mesh.mNormals orelse return null;
+    return ptr[0..mesh.mNumVertices];
+}
+
+pub fn meshTangents(mesh: *const types.aiMesh) ?[]const types.aiVector3D {
+    const ptr = mesh.mTangents orelse return null;
+    return ptr[0..mesh.mNumVertices];
+}
+
+pub fn meshBitangents(mesh: *const types.aiMesh) ?[]const types.aiVector3D {
+    const ptr = mesh.mBitangents orelse return null;
+    return ptr[0..mesh.mNumVertices];
+}
+
+pub fn meshColors(mesh: *const types.aiMesh, set: c_uint) ?[]const types.aiColor4D {
+    if (set >= types.AI_MAX_NUMBER_OF_COLOR_SETS) return null;
+    const ptr = mesh.mColors[set] orelse return null;
+    return ptr[0..mesh.mNumVertices];
+}
+
+pub fn meshTexCoords(mesh: *const types.aiMesh, set: c_uint) ?[]const types.aiVector3D {
+    if (set >= types.AI_MAX_NUMBER_OF_TEXTURECOORDS) return null;
+    const ptr = mesh.mTextureCoords[set] orelse return null;
+    return ptr[0..mesh.mNumVertices];
+}
+
+pub fn meshFaces(mesh: *const types.aiMesh) ?[]const types.aiFace {
+    const ptr = mesh.mFaces orelse return null;
+    return ptr[0..mesh.mNumFaces];
+}
+
+pub fn meshBones(mesh: *const types.aiMesh) []const *const types.aiBone {
+    if (mesh.mBones) |ptr| return ptr[0..mesh.mNumBones];
+    return &[_]*const types.aiBone{};
+}
+
 const std = @import("std");
