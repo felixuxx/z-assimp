@@ -314,3 +314,377 @@ pub const aiProcessPreset_TargetRealtime_MaxQuality: c_uint = @bitCast(aiPostPro
     .validate_data_structure = true,
     .optimize_meshes = true,
 });
+
+pub const aiVector2D = extern struct {
+    x: ai_real,
+    y: ai_real,
+};
+
+pub const aiVector3D = extern struct {
+    x: ai_real,
+    y: ai_real,
+    z: ai_real,
+};
+
+pub const aiColor3D = extern struct {
+    r: ai_real,
+    g: ai_real,
+    b: ai_real,
+};
+
+pub const aiColor4D = extern struct {
+    r: ai_real,
+    g: ai_real,
+    b: ai_real,
+    a: ai_real,
+};
+
+pub const aiMatrix3x3 = extern struct {
+    a1: ai_real, a2: ai_real, a3: ai_real,
+    b1: ai_real, b2: ai_real, b3: ai_real,
+    c1: ai_real, c2: ai_real, c3: ai_real,
+};
+
+pub const aiMatrix4x4 = extern struct {
+    a1: ai_real, a2: ai_real, a3: ai_real, a4: ai_real,
+    b1: ai_real, b2: ai_real, b3: ai_real, b4: ai_real,
+    c1: ai_real, c2: ai_real, c3: ai_real, c4: ai_real,
+    d1: ai_real, d2: ai_real, d3: ai_real, d4: ai_real,
+};
+
+pub const aiQuaternion = extern struct {
+    w: ai_real,
+    x: ai_real,
+    y: ai_real,
+    z: ai_real,
+};
+
+pub const aiPlane = extern struct {
+    a: ai_real,
+    b: ai_real,
+    c: ai_real,
+    d: ai_real,
+};
+
+pub const aiRay = extern struct {
+    pos: aiVector3D,
+    dir: aiVector3D,
+};
+
+pub const aiAABB = extern struct {
+    mMin: aiVector3D,
+    mMax: aiVector3D,
+};
+
+pub const aiUVTransform = extern struct {
+    mTranslation: aiVector2D,
+    mScaling: aiVector2D,
+    mRotation: ai_real,
+};
+
+pub const aiString = extern struct {
+    length: ai_uint32,
+    data: [1024]u8,
+};
+
+pub const aiMemoryInfo = extern struct {
+    textures: c_uint,
+    materials: c_uint,
+    meshes: c_uint,
+    nodes: c_uint,
+    animations: c_uint,
+    cameras: c_uint,
+    lights: c_uint,
+    total: c_uint,
+};
+
+pub const aiPropertyStore = opaque {};
+
+pub const aiLogStreamCallback = *const fn (message: [*:0]const u8, user: ?*anyopaque) callconv(.c) void;
+
+pub const aiLogStream = extern struct {
+    callback: ?aiLogStreamCallback,
+    user: ?*anyopaque,
+};
+
+pub const aiExportFormatDesc = extern struct {
+    id: ?[*:0]const u8,
+    description: ?[*:0]const u8,
+    fileExtension: ?[*:0]const u8,
+};
+
+pub const aiExportDataBlob = extern struct {
+    size: usize,
+    data: ?*anyopaque,
+    name: aiString,
+    next: ?*aiExportDataBlob,
+};
+
+pub const aiImporterDesc = extern struct {
+    mName: ?[*:0]const u8,
+    mAuthor: ?[*:0]const u8,
+    mMaintainer: ?[*:0]const u8,
+    mComments: ?[*:0]const u8,
+    mFlags: c_uint,
+    mMinMajor: c_uint,
+    mMinMinor: c_uint,
+    mMaxMajor: c_uint,
+    mMaxMinor: c_uint,
+    mFileExtensions: ?[*:0]const u8,
+};
+
+pub const aiFace = extern struct {
+    mNumIndices: c_uint,
+    mIndices: ?[*]c_uint,
+};
+
+pub const aiVertexWeight = extern struct {
+    mVertexId: c_uint,
+    mWeight: ai_real,
+};
+
+pub const aiNode = extern struct {
+    mName: aiString,
+    mTransformation: aiMatrix4x4,
+    mParent: ?*aiNode,
+    mNumChildren: c_uint,
+    mChildren: ?[*]?*aiNode,
+    mNumMeshes: c_uint,
+    mMeshes: ?[*]c_uint,
+    mMetaData: ?*aiMetadata,
+};
+
+pub const aiBone = extern struct {
+    mName: aiString,
+    mNumWeights: c_uint,
+    mArmature: ?*aiNode,
+    mNode: ?*aiNode,
+    mWeights: ?[*]aiVertexWeight,
+    mOffsetMatrix: aiMatrix4x4,
+};
+
+pub const aiAnimMesh = extern struct {
+    mName: aiString,
+    mVertices: ?[*]aiVector3D,
+    mNormals: ?[*]aiVector3D,
+    mTangents: ?[*]aiVector3D,
+    mBitangents: ?[*]aiVector3D,
+    mColors: [8]?[*]aiColor4D,
+    mTextureCoords: [8]?[*]aiVector3D,
+    mNumVertices: c_uint,
+    mWeight: f32,
+};
+
+pub const aiMesh = extern struct {
+    mPrimitiveTypes: c_uint,
+    mNumVertices: c_uint,
+    mNumFaces: c_uint,
+    mVertices: ?[*]aiVector3D,
+    mNormals: ?[*]aiVector3D,
+    mTangents: ?[*]aiVector3D,
+    mBitangents: ?[*]aiVector3D,
+    mColors: [8]?[*]aiColor4D,
+    mTextureCoords: [8]?[*]aiVector3D,
+    mNumUVComponents: [8]c_uint,
+    mFaces: ?[*]aiFace,
+    mNumBones: c_uint,
+    mBones: ?[*]?*aiBone,
+    mMaterialIndex: c_uint,
+    mName: aiString,
+    mNumAnimMeshes: c_uint,
+    mAnimMeshes: ?[*]?*aiAnimMesh,
+    mMethod: aiMorphingMethod,
+    mAABB: aiAABB,
+    mTextureCoordsNames: ?[*]?*aiString,
+};
+
+pub const aiSkeletonBone = extern struct {
+    mParent: c_int,
+    mArmature: ?*aiNode,
+    mNode: ?*aiNode,
+    mNumnWeights: c_uint,
+    mMeshId: ?*aiMesh,
+    mWeights: ?[*]aiVertexWeight,
+    mOffsetMatrix: aiMatrix4x4,
+    mLocalMatrix: aiMatrix4x4,
+};
+
+pub const aiSkeleton = extern struct {
+    mName: aiString,
+    mNumBones: c_uint,
+    mBones: ?[*]?*aiSkeletonBone,
+};
+
+pub const aiMaterialProperty = extern struct {
+    mKey: aiString,
+    mSemantic: c_uint,
+    mIndex: c_uint,
+    mDataLength: c_uint,
+    mType: aiPropertyTypeInfo,
+    mData: ?[*]u8,
+};
+
+pub const aiMaterial = extern struct {
+    mProperties: ?[*]?*aiMaterialProperty,
+    mNumProperties: c_uint,
+    mNumAllocated: c_uint,
+};
+
+pub const aiVectorKey = extern struct {
+    mTime: f64,
+    mValue: aiVector3D,
+};
+
+pub const aiQuatKey = extern struct {
+    mTime: f64,
+    mValue: aiQuaternion,
+};
+
+pub const aiMeshKey = extern struct {
+    mTime: f64,
+    mValue: c_uint,
+};
+
+pub const aiMeshMorphKey = extern struct {
+    mTime: f64,
+    mValues: ?[*]c_uint,
+    mWeights: ?[*]f64,
+    mNumValuesAndWeights: c_uint,
+};
+
+pub const aiNodeAnim = extern struct {
+    mNodeName: aiString,
+    mNumPositionKeys: c_uint,
+    mPositionKeys: ?[*]aiVectorKey,
+    mNumRotationKeys: c_uint,
+    mRotationKeys: ?[*]aiQuatKey,
+    mNumScalingKeys: c_uint,
+    mScalingKeys: ?[*]aiVectorKey,
+    mPreState: aiAnimBehaviour,
+    mPostState: aiAnimBehaviour,
+};
+
+pub const aiMeshAnim = extern struct {
+    mName: aiString,
+    mNumKeys: c_uint,
+    mKeys: ?[*]aiMeshKey,
+};
+
+pub const aiMeshMorphAnim = extern struct {
+    mName: aiString,
+    mNumKeys: c_uint,
+    mKeys: ?[*]aiMeshMorphKey,
+};
+
+pub const aiAnimation = extern struct {
+    mName: aiString,
+    mDuration: f64,
+    mTicksPerSecond: f64,
+    mNumChannels: c_uint,
+    mChannels: ?[*]?*aiNodeAnim,
+    mNumMeshChannels: c_uint,
+    mMeshChannels: ?[*]?*aiMeshAnim,
+    mNumMorphMeshChannels: c_uint,
+    mMorphMeshChannels: ?[*]?*aiMeshMorphAnim,
+};
+
+pub const aiCamera = extern struct {
+    mName: aiString,
+    mPosition: aiVector3D,
+    mUp: aiVector3D,
+    mLookAt: aiVector3D,
+    mHorizontalFOV: ai_real,
+    mClipPlaneNear: ai_real,
+    mClipPlaneFar: ai_real,
+    mAspect: ai_real,
+    mOrthographicWidth: ai_real,
+};
+
+pub const aiLight = extern struct {
+    mName: aiString,
+    mType: aiLightSourceType,
+    mPosition: aiVector3D,
+    mDirection: aiVector3D,
+    mUp: aiVector3D,
+    mAttenuationConstant: ai_real,
+    mAttenuationLinear: ai_real,
+    mAttenuationQuadratic: ai_real,
+    mColorDiffuse: aiColor3D,
+    mColorSpecular: aiColor3D,
+    mColorAmbient: aiColor3D,
+    mAngleInnerCone: ai_real,
+    mAngleOuterCone: ai_real,
+    mSize: aiVector3D,
+};
+
+pub const aiTexel = extern struct {
+    b: u8,
+    g: u8,
+    r: u8,
+    a: u8,
+};
+
+pub const aiTexture = extern struct {
+    mWidth: c_uint,
+    mHeight: c_uint,
+    achFormatHint: [9]u8,
+    pcData: ?*aiTexel,
+    mFilename: aiString,
+};
+
+pub const aiMetadataEntry = extern struct {
+    mType: aiMetadataType,
+    mData: ?*anyopaque,
+};
+
+pub const aiMetadata = extern struct {
+    mNumProperties: c_uint,
+    mKeys: ?[*]aiString,
+    mValues: ?[*]aiMetadataEntry,
+};
+
+pub const aiScene = extern struct {
+    mFlags: c_uint,
+    mRootNode: ?*aiNode,
+    mNumMeshes: c_uint,
+    mMeshes: ?[*]?*aiMesh,
+    mNumMaterials: c_uint,
+    mMaterials: ?[*]?*aiMaterial,
+    mNumAnimations: c_uint,
+    mAnimations: ?[*]?*aiAnimation,
+    mNumTextures: c_uint,
+    mTextures: ?[*]?*aiTexture,
+    mNumLights: c_uint,
+    mLights: ?[*]?*aiLight,
+    mNumCameras: c_uint,
+    mCameras: ?[*]?*aiCamera,
+    mMetaData: ?*aiMetadata,
+    mName: aiString,
+    mNumSkeletons: c_uint,
+    mSkeletons: ?[*]?*aiSkeleton,
+    mPrivate: ?*anyopaque,
+};
+
+pub const aiFileWriteProc = *const fn (file: *aiFile, data: ?[*]const u8, size: usize, count: usize) callconv(.c) usize;
+pub const aiFileReadProc = *const fn (file: *aiFile, data: ?[*]u8, size: usize, count: usize) callconv(.c) usize;
+pub const aiFileTellProc = *const fn (file: *aiFile) callconv(.c) usize;
+pub const aiFileFlushProc = *const fn (file: *aiFile) callconv(.c) void;
+pub const aiFileSeek = *const fn (file: *aiFile, offset: usize, origin: aiOrigin) callconv(.c) aiReturn;
+pub const aiFileOpenProc = *const fn (io: *aiFileIO, path: [*:0]const u8, mode: [*:0]const u8) callconv(.c) ?*aiFile;
+pub const aiFileCloseProc = *const fn (io: *aiFileIO, file: *aiFile) callconv(.c) void;
+
+pub const aiFileIO = extern struct {
+    OpenProc: aiFileOpenProc,
+    CloseProc: aiFileCloseProc,
+    UserData: aiUserData,
+};
+
+pub const aiFile = extern struct {
+    ReadProc: aiFileReadProc,
+    WriteProc: aiFileWriteProc,
+    TellProc: aiFileTellProc,
+    FileSizeProc: aiFileTellProc,
+    SeekProc: aiFileSeek,
+    FlushProc: aiFileFlushProc,
+    UserData: aiUserData,
+};
