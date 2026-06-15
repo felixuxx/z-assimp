@@ -578,6 +578,14 @@ pub fn nodeAnimScalingKeys(na: *const types.aiNodeAnim) ?[]const types.aiVectorK
     return ptr[0..na.mNumScalingKeys];
 }
 
+pub fn nodeFindByName(node: *const types.aiNode, name: []const u8) ?*const types.aiNode {
+    if (std.mem.eql(u8, node.mName.toSlice(), name)) return node;
+    for (nodeChildren(node)) |child| {
+        if (nodeFindByName(child, name)) |found| return found;
+    }
+    return null;
+}
+
 pub fn toSlice(s: *const types.aiString) []const u8 {
     return s.data[0..s.length];
 }
