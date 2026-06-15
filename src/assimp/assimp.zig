@@ -119,3 +119,275 @@ pub const AI_CONFIG_PP_SBP_REMOVE = types.AI_CONFIG_PP_SBP_REMOVE;
 pub const AI_CONFIG_GLOBAL_SCALE_FACTOR_KEY = types.AI_CONFIG_GLOBAL_SCALE_FACTOR_KEY;
 
 pub const ImportError = error{ImportFailed};
+
+pub const Importer = struct {
+    allocator: std.mem.Allocator,
+    scene: ?*const types.aiScene,
+    property_store: ?*types.aiPropertyStore,
+
+    pub fn init(allocator: std.mem.Allocator) Importer {
+        return .{
+            .allocator = allocator,
+            .scene = null,
+            .property_store = null,
+        };
+    }
+
+    pub fn deinit(self: *Importer) void {
+        self.releaseScene();
+        if (self.property_store) |store| {
+            c.aiReleasePropertyStore(store);
+            self.property_store = null;
+        }
+    }
+
+    pub fn importFile(self: *Importer, path: [:0]const u8, flags: types.aiPostProcessSteps) !*const types.aiScene {
+        self.releaseScene();
+        const scene = c.aiImportFile(path.ptr, @bitCast(flags));
+        if (scene) |s| {
+            self.scene = s;
+            return s;
+        }
+        return error.ImportFailed;
+    }
+
+    pub fn importFileEx(self: *Importer, path: [:0]const u8, flags: types.aiPostProcessSteps, fs: ?*types.aiFileIO) !*const types.aiScene {
+        self.releaseScene();
+        const scene = c.aiImportFileEx(path.ptr, @bitCast(flags), fs);
+        if (scene) |s| {
+            self.scene = s;
+            return s;
+        }
+        return error.ImportFailed;
+    }
+
+    pub fn importFileExWithProperties(self: *Importer, path: [:0]const u8, flags: types.aiPostProcessSteps, fs: ?*types.aiFileIO) !*const types.aiScene {
+        self.releaseScene();
+        const store = self.getOrCreatePropertyStore();
+        const scene = c.aiImportFileExWithProperties(path.ptr, @bitCast(flags), fs, store);
+        if (scene) |s| {
+            self.scene = s;
+            return s;
+        }
+        return error.ImportFailed;
+    }
+
+    pub fn importFileFromMemory(self: *Importer, buffer: []const u8, hint: [:0]const u8, flags: types.aiPostProcessSteps) !*const types.aiScene {
+        self.releaseScene();
+        const scene = c.aiImportFileFromMemory(buffer.ptr, @as(c_uint, @intCast(buffer.len)), @bitCast(flags), hint.ptr);
+        if (scene) |s| {
+            self.scene = s;
+            return s;
+        }
+        return error.ImportFailed;
+    }
+
+    pub fn importFileFromMemoryWithProperties(self: *Importer, buffer: []const u8, hint: [:0]const u8, flags: types.aiPostProcessSteps) !*const types.aiScene {
+        self.releaseScene();
+        const store = self.getOrCreatePropertyStore();
+        const scene = c.aiImportFileFromMemoryWithProperties(buffer.ptr, @as(c_uint, @intCast(buffer.len)), @bitCast(flags), hint.ptr, store);
+        if (scene) |s| {
+            self.scene = s;
+            return s;
+        }
+        return error.ImportFailed;
+    }
+
+    pub fn applyPostProcessing(self: *Importer, flags: types.aiPostProcessSteps) !void {
+        const scene = self.scene orelse return;
+        const result = c.aiApplyPostProcessing(scene, @bitCast(flags));
+        self.scene = result;
+        if (result == null) {
+            return error.ImportFailed;
+        }
+    }
+
+    pub fn releaseScene(self: *Importer) void {
+        if (self.scene) |scene| {
+            c.aiReleaseImport(scene);
+            self.scene = null;
+        }
+    }
+
+    pub fn getScene(self: *const Importer) ?*const types.aiScene {
+        return self.scene;
+    }
+
+    pub fn getOrCreatePropertyStore(self: *Importer) ?*types.aiPropertyStore {
+        if (self.property_store) |store| return store;
+        self.property_store = c.aiCreatePropertyStore();
+        return self.property_store;
+    }
+
+    pub fn setPropertyInteger(self: *Importer, key: [:0]const u8, value: c_int) void {
+        if (self.getOrCreatePropertyStore()) |store|
+            c.aiSetImportPropertyInteger(store, key.ptr, value);
+    }
+
+    pub fn setPropertyFloat(self: *Importer, key: [:0]const u8, value: types.ai_real) void {
+        if (self.getOrCreatePropertyStore()) |store|
+            c.aiSetImportPropertyFloat(store, key.ptr, value);
+    }
+
+    pub fn setPropertyString(self: *Importer, key: [:0]const u8, value: *const types.aiString) void {
+        if (self.getOrCreatePropertyStore()) |store|
+            c.aiSetImportPropertyString(store, key.ptr, value);
+    }
+
+    pub fn setPropertyMatrix(self: *Importer, key: [:0]const u8, value: *const types.aiMatrix4x4) void {
+        if (self.getOrCreatePropertyStore()) |store|
+            c.aiSetImportPropertyMatrix(store, key.ptr, value);
+    }
+
+    pub fn isExtensionSupported(ext: [:0]const u8) bool {
+        return c.aiIsExtensionSupported(ext.ptr) != 0;
+    }
+
+    pub fn getExtensionList(buffer: *types.aiString) void {
+        c.aiGetExtensionList(buffer);
+    }
+
+    pub fn getMemoryRequirements(scene: *const types.aiScene, info: *types.aiMemoryInfo) void {
+        c.aiGetMemoryRequirements(scene, info);
+    }
+
+    pub fn getErrorString() [:0]const u8 {
+        return c.aiGetErrorString();
+    }
+
+    pub fn getVersionMajor() c_uint {
+        return c.aiGetVersionMajor();
+    }
+
+    pub fn getVersionMinor() c_uint {
+        return c.aiGetVersionMinor();
+    }
+
+    pub fn getVersionPatch() c_uint {
+        return c.aiGetVersionPatch();
+    }
+
+    pub fn getVersionRevision() c_uint {
+        return c.aiGetVersionRevision();
+    }
+
+    pub fn getCompileFlags() c_uint {
+        return c.aiGetCompileFlags();
+    }
+
+    pub fn getLegalString() [:0]const u8 {
+        return c.aiGetLegalString();
+    }
+
+    pub fn getBranchName() [:0]const u8 {
+        return c.aiGetBranchName();
+    }
+
+    pub fn getImportFormatCount() usize {
+        return c.aiGetImportFormatCount();
+    }
+
+    pub fn getImportFormatDescription(index: usize) ?*const types.aiImporterDesc {
+        return c.aiGetImportFormatDescription(index);
+    }
+
+    pub fn getPredefinedLogStream(stream: types.aiDefaultLogStream, file: ?[:0]const u8) types.aiLogStream {
+        return c.aiGetPredefinedLogStream(stream, if (file) |f| f.ptr else null);
+    }
+
+    pub fn attachLogStream(stream: *const types.aiLogStream) void {
+        c.aiAttachLogStream(stream);
+    }
+
+    pub fn detachLogStream(stream: *const types.aiLogStream) types.aiReturn {
+        return c.aiDetachLogStream(stream);
+    }
+
+    pub fn detachAllLogStreams() void {
+        c.aiDetachAllLogStreams();
+    }
+
+    pub fn enableVerboseLogging(enabled: bool) void {
+        c.aiEnableVerboseLogging(if (enabled) types.AI_TRUE else types.AI_FALSE);
+    }
+
+    pub fn getExportFormatCount() usize {
+        return c.aiGetExportFormatCount();
+    }
+
+    pub fn getExportFormatDescription(index: usize) ?*const types.aiExportFormatDesc {
+        return c.aiGetExportFormatDescription(index);
+    }
+
+    pub fn releaseExportFormatDescription(desc: ?*const types.aiExportFormatDesc) void {
+        c.aiReleaseExportFormatDescription(desc);
+    }
+
+    pub fn exportScene(scene: *const types.aiScene, format_id: [:0]const u8, file_name: [:0]const u8, preprocessing: types.aiPostProcessSteps) types.aiReturn {
+        return c.aiExportScene(scene, format_id.ptr, file_name.ptr, @bitCast(preprocessing));
+    }
+
+    pub fn exportSceneEx(scene: *const types.aiScene, format_id: [:0]const u8, file_name: [:0]const u8, io: ?*types.aiFileIO, preprocessing: types.aiPostProcessSteps) types.aiReturn {
+        return c.aiExportSceneEx(scene, format_id.ptr, file_name.ptr, io, @bitCast(preprocessing));
+    }
+
+    pub fn exportSceneToBlob(scene: *const types.aiScene, format_id: [:0]const u8, preprocessing: types.aiPostProcessSteps) ?*const types.aiExportDataBlob {
+        return c.aiExportSceneToBlob(scene, format_id.ptr, @bitCast(preprocessing));
+    }
+
+    pub fn releaseExportBlob(data: ?*const types.aiExportDataBlob) void {
+        c.aiReleaseExportBlob(data);
+    }
+
+    pub fn copyScene(src: *const types.aiScene) !*types.aiScene {
+        var dst: ?*types.aiScene = null;
+        c.aiCopyScene(src, &dst);
+        return dst orelse error.ImportFailed;
+    }
+
+    pub fn freeScene(scene: ?*const types.aiScene) void {
+        c.aiFreeScene(scene);
+    }
+
+    pub fn getImporterDesc(extension: [:0]const u8) ?*const types.aiImporterDesc {
+        return c.aiGetImporterDesc(extension.ptr);
+    }
+};
+
+pub fn getMaterialFloat(mat: *const types.aiMaterial, key: [:0]const u8, type_: c_uint, index: c_uint, out: *types.ai_real) types.aiReturn {
+    return c.aiGetMaterialFloatArray(mat, key.ptr, type_, index, out, null);
+}
+
+pub fn getMaterialInteger(mat: *const types.aiMaterial, key: [:0]const u8, type_: c_uint, index: c_uint, out: *c_int) types.aiReturn {
+    return c.aiGetMaterialIntegerArray(mat, key.ptr, type_, index, out, null);
+}
+
+pub fn getMaterialFloatArray(mat: *const types.aiMaterial, key: [:0]const u8, type_: c_uint, index: c_uint, out: *types.ai_real, max: ?*c_uint) types.aiReturn {
+    return c.aiGetMaterialFloatArray(mat, key.ptr, type_, index, out, max);
+}
+
+pub fn getMaterialIntegerArray(mat: *const types.aiMaterial, key: [:0]const u8, type_: c_uint, index: c_uint, out: *c_int, max: ?*c_uint) types.aiReturn {
+    return c.aiGetMaterialIntegerArray(mat, key.ptr, type_, index, out, max);
+}
+
+pub fn getMaterialColor(mat: *const types.aiMaterial, key: [:0]const u8, type_: c_uint, index: c_uint, out: *types.aiColor4D) types.aiReturn {
+    return c.aiGetMaterialColor(mat, key.ptr, type_, index, out);
+}
+
+pub fn getMaterialUVTransform(mat: *const types.aiMaterial, key: [:0]const u8, type_: c_uint, index: c_uint, out: *types.aiUVTransform) types.aiReturn {
+    return c.aiGetMaterialUVTransform(mat, key.ptr, type_, index, out);
+}
+
+pub fn getMaterialString(mat: *const types.aiMaterial, key: [:0]const u8, type_: c_uint, index: c_uint, out: *types.aiString) types.aiReturn {
+    return c.aiGetMaterialString(mat, key.ptr, type_, index, out);
+}
+
+pub fn getMaterialTextureCount(mat: *const types.aiMaterial, type_: types.aiTextureType) c_uint {
+    return c.aiGetMaterialTextureCount(mat, type_);
+}
+
+pub fn getMaterialTexture(mat: *const types.aiMaterial, type_: types.aiTextureType, index: c_uint, path: *types.aiString, mapping: ?*types.aiTextureMapping, uvindex: ?*c_uint, blend: ?*types.ai_real, op: ?*types.aiTextureOp, mapmode: ?*types.aiTextureMapMode, flags: ?*c_uint) types.aiReturn {
+    return c.aiGetMaterialTexture(mat, type_, index, path, mapping, uvindex, blend, op, mapmode, flags);
+}
+
+const std = @import("std");
