@@ -548,6 +548,36 @@ pub fn materialGetTextureInfo(mat: *const types.aiMaterial, type_: types.aiTextu
     };
 }
 
+pub fn animationChannels(anim: *const types.aiAnimation) []const *const types.aiNodeAnim {
+    if (anim.mChannels) |ptr| return ptr[0..anim.mNumChannels];
+    return &[_]*const types.aiNodeAnim{};
+}
+
+pub fn animationMeshChannels(anim: *const types.aiAnimation) []const *const types.aiMeshAnim {
+    if (anim.mMeshChannels) |ptr| return ptr[0..anim.mNumMeshChannels];
+    return &[_]*const types.aiMeshAnim{};
+}
+
+pub fn animationMorphChannels(anim: *const types.aiAnimation) []const *const types.aiMeshMorphAnim {
+    if (anim.mMorphMeshChannels) |ptr| return ptr[0..anim.mNumMorphMeshChannels];
+    return &[_]*const types.aiMeshMorphAnim{};
+}
+
+pub fn nodeAnimPositionKeys(na: *const types.aiNodeAnim) ?[]const types.aiVectorKey {
+    const ptr = na.mPositionKeys orelse return null;
+    return ptr[0..na.mNumPositionKeys];
+}
+
+pub fn nodeAnimRotationKeys(na: *const types.aiNodeAnim) ?[]const types.aiQuatKey {
+    const ptr = na.mRotationKeys orelse return null;
+    return ptr[0..na.mNumRotationKeys];
+}
+
+pub fn nodeAnimScalingKeys(na: *const types.aiNodeAnim) ?[]const types.aiVectorKey {
+    const ptr = na.mScalingKeys orelse return null;
+    return ptr[0..na.mNumScalingKeys];
+}
+
 pub fn toSlice(s: *const types.aiString) []const u8 {
     return s.data[0..s.length];
 }
