@@ -141,6 +141,10 @@ pub fn build(b: *std.Build) !void {
 
     b.installArtifact(lib);
 
+    _ = b.addModule("assimp", .{
+        .root_source_file = b.path("src/assimp/assimp.zig"),
+    });
+
     const example_cpp = b.addExecutable(.{
         .name = "static-example-cpp",
         .root_module = b.createModule(.{
