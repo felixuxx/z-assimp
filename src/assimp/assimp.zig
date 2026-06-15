@@ -359,6 +359,20 @@ pub fn getMaterialTexture(mat: *const types.aiMaterial, type_: types.aiTextureTy
     return c.aiGetMaterialTexture(mat, type_, index, path, mapping, uvindex, blend, op, mapmode, flags);
 }
 
+pub const SceneFlags = packed struct(u32) {
+    incomplete: bool = false,
+    validated: bool = false,
+    validation_warning: bool = false,
+    non_verbose_format: bool = false,
+    terrain: bool = false,
+    allow_shared: bool = false,
+    _: u26 = 0,
+};
+
+pub fn sceneFlags(scene: *const types.aiScene) SceneFlags {
+    return @bitCast(scene.mFlags);
+}
+
 pub fn sceneMeshes(scene: *const types.aiScene) []const *const types.aiMesh {
     if (scene.mMeshes) |ptr| return ptr[0..scene.mNumMeshes];
     return &[_]*const types.aiMesh{};
