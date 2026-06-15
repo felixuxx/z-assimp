@@ -390,4 +390,77 @@ pub fn getMaterialTexture(mat: *const types.aiMaterial, type_: types.aiTextureTy
     return c.aiGetMaterialTexture(mat, type_, index, path, mapping, uvindex, blend, op, mapmode, flags);
 }
 
+pub fn sceneMeshes(scene: *const types.aiScene) []const *const types.aiMesh {
+    if (scene.mMeshes) |ptr| return ptr[0..scene.mNumMeshes];
+    return &[_]*const types.aiMesh{};
+}
+
+pub fn sceneMaterials(scene: *const types.aiScene) []const *const types.aiMaterial {
+    if (scene.mMaterials) |ptr| return ptr[0..scene.mNumMaterials];
+    return &[_]*const types.aiMaterial{};
+}
+
+pub fn sceneAnimations(scene: *const types.aiScene) []const *const types.aiAnimation {
+    if (scene.mAnimations) |ptr| return ptr[0..scene.mNumAnimations];
+    return &[_]*const types.aiAnimation{};
+}
+
+pub fn sceneCameras(scene: *const types.aiScene) []const *const types.aiCamera {
+    if (scene.mCameras) |ptr| return ptr[0..scene.mNumCameras];
+    return &[_]*const types.aiCamera{};
+}
+
+pub fn sceneLights(scene: *const types.aiScene) []const *const types.aiLight {
+    if (scene.mLights) |ptr| return ptr[0..scene.mNumLights];
+    return &[_]*const types.aiLight{};
+}
+
+pub fn sceneTextures(scene: *const types.aiScene) []const *const types.aiTexture {
+    if (scene.mTextures) |ptr| return ptr[0..scene.mNumTextures];
+    return &[_]*const types.aiTexture{};
+}
+
+pub fn sceneSkeletons(scene: *const types.aiScene) []const *const types.aiSkeleton {
+    if (scene.mSkeletons) |ptr| return ptr[0..scene.mNumSkeletons];
+    return &[_]*const types.aiSkeleton{};
+}
+
+pub fn sceneHasMeshes(scene: *const types.aiScene) bool {
+    return scene.mMeshes != null and scene.mNumMeshes > 0;
+}
+
+pub fn sceneHasMaterials(scene: *const types.aiScene) bool {
+    return scene.mMaterials != null and scene.mNumMaterials > 0;
+}
+
+pub fn sceneHasTextures(scene: *const types.aiScene) bool {
+    return scene.mTextures != null and scene.mNumTextures > 0;
+}
+
+pub fn sceneHasAnimations(scene: *const types.aiScene) bool {
+    return scene.mAnimations != null and scene.mNumAnimations > 0;
+}
+
+pub fn sceneHasCameras(scene: *const types.aiScene) bool {
+    return scene.mCameras != null and scene.mNumCameras > 0;
+}
+
+pub fn sceneHasLights(scene: *const types.aiScene) bool {
+    return scene.mLights != null and scene.mNumLights > 0;
+}
+
+pub fn nodeChildren(node: *const types.aiNode) []const *const types.aiNode {
+    if (node.mChildren) |ptr| return ptr[0..node.mNumChildren];
+    return &[_]*const types.aiNode{};
+}
+
+pub fn nodeMeshIndices(node: *const types.aiNode) []const c_uint {
+    if (node.mMeshes) |ptr| return ptr[0..node.mNumMeshes];
+    return &[_]c_uint{};
+}
+
+pub fn nodeIsRoot(node: *const types.aiNode) bool {
+    return node.mParent == null;
+}
+
 const std = @import("std");
