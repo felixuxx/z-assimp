@@ -120,6 +120,9 @@ pub const AI_CONFIG_GLOBAL_SCALE_FACTOR_KEY = types.AI_CONFIG_GLOBAL_SCALE_FACTO
 
 pub const exporter = @import("exporter.zig");
 pub const Exporter = exporter.Exporter;
+pub const fileio = @import("fileio.zig");
+pub const metadata = @import("metadata.zig");
+pub const MetadataValue = metadata.MetadataValue;
 
 pub const ImportError = error{ImportFailed};
 
