@@ -548,4 +548,13 @@ pub fn materialGetTextureInfo(mat: *const types.aiMaterial, type_: types.aiTextu
     };
 }
 
+pub fn toSlice(s: *const types.aiString) []const u8 {
+    return s.data[0..s.length];
+}
+
+pub fn toSlice(face: *const types.aiFace) []const c_uint {
+    if (face.mIndices) |ptr| return ptr[0..face.mNumIndices];
+    return &[_]c_uint{};
+}
+
 const std = @import("std");
