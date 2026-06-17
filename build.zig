@@ -13,7 +13,7 @@ fn lazy_from_path(path_chars: []const u8, owner: *std.Build) std.Build.LazyPath 
 pub fn build(b: *std.Build) !void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
-    const formats = b.option([]const u8, "formats", "Comma separated list of enabled formats or \"all\", for example: STL,3MF,Obj") orelse "";
+    const formats = b.option([]const u8, "formats", "Comma separated list of enabled formats or \"all\", for example: STL,3MF,Obj") orelse "Obj";
     const use_double_precision = b.option(bool, "double", "All data will be stored as double values") orelse false;
     const assimp = b.dependency("assimp", .{});
 
@@ -141,7 +141,7 @@ pub fn build(b: *std.Build) !void {
 
     b.installArtifact(lib);
 
-    _ = b.addModule("assimp", .{
+    const assimp_mod = b.addModule("assimp", .{
         .root_source_file = b.path("src/assimp/assimp.zig"),
     });
 
@@ -187,6 +187,26 @@ pub fn build(b: *std.Build) !void {
         example_c.root_module.addCMacro("_WIN32", "");
     }
     b.installArtifact(example_c);
+
+    const test_exe = b.addTest(.{
+        .root_module = b.createModule(.{
+            .target = target,
+            .optimize = optimize,
+            .root_source_file = b.path("test/assimp_test.zig"),
+        }),
+    });
+    test_exe.root_module.addImport("assimp", assimp_mod);
+    test_exe.root_module.linkLibrary(lib);
+    test_exe.root_module.link_libc = true;
+    if (target.result.abi != .msvc) {
+        test_exe.root_module.link_libcpp = true;
+    }
+    const test_step = b.step("test", "Run assimp bindings tests");
+    if (b.args) |args| {
+        test_exe.filters = args;
+    }
+    const run_test = b.addRunArtifact(test_exe);
+    test_step.dependOn(&run_test.step);
 }
 
 const unsupported_formats = [_][]const u8{

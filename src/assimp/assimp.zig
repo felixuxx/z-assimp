@@ -258,7 +258,7 @@ pub const Importer = struct {
         c.aiGetMemoryRequirements(scene, info);
     }
 
-    pub fn getErrorString() [:0]const u8 {
+    pub fn getErrorString() [*:0]const u8 {
         return c.aiGetErrorString();
     }
 
@@ -282,11 +282,11 @@ pub const Importer = struct {
         return c.aiGetCompileFlags();
     }
 
-    pub fn getLegalString() [:0]const u8 {
+    pub fn getLegalString() [*:0]const u8 {
         return c.aiGetLegalString();
     }
 
-    pub fn getBranchName() [:0]const u8 {
+    pub fn getBranchName() [*:0]const u8 {
         return c.aiGetBranchName();
     }
 
@@ -373,39 +373,39 @@ pub fn sceneFlags(scene: *const types.aiScene) SceneFlags {
     return @bitCast(scene.mFlags);
 }
 
-pub fn sceneMeshes(scene: *const types.aiScene) []const *const types.aiMesh {
+pub fn sceneMeshes(scene: *const types.aiScene) []const ?*types.aiMesh {
     if (scene.mMeshes) |ptr| return ptr[0..scene.mNumMeshes];
-    return &[_]*const types.aiMesh{};
+    return &[_]?*types.aiMesh{};
 }
 
-pub fn sceneMaterials(scene: *const types.aiScene) []const *const types.aiMaterial {
+pub fn sceneMaterials(scene: *const types.aiScene) []const ?*types.aiMaterial {
     if (scene.mMaterials) |ptr| return ptr[0..scene.mNumMaterials];
-    return &[_]*const types.aiMaterial{};
+    return &[_]?*types.aiMaterial{};
 }
 
-pub fn sceneAnimations(scene: *const types.aiScene) []const *const types.aiAnimation {
+pub fn sceneAnimations(scene: *const types.aiScene) []const ?*types.aiAnimation {
     if (scene.mAnimations) |ptr| return ptr[0..scene.mNumAnimations];
-    return &[_]*const types.aiAnimation{};
+    return &[_]?*types.aiAnimation{};
 }
 
-pub fn sceneCameras(scene: *const types.aiScene) []const *const types.aiCamera {
+pub fn sceneCameras(scene: *const types.aiScene) []const ?*types.aiCamera {
     if (scene.mCameras) |ptr| return ptr[0..scene.mNumCameras];
-    return &[_]*const types.aiCamera{};
+    return &[_]?*types.aiCamera{};
 }
 
-pub fn sceneLights(scene: *const types.aiScene) []const *const types.aiLight {
+pub fn sceneLights(scene: *const types.aiScene) []const ?*types.aiLight {
     if (scene.mLights) |ptr| return ptr[0..scene.mNumLights];
-    return &[_]*const types.aiLight{};
+    return &[_]?*types.aiLight{};
 }
 
-pub fn sceneTextures(scene: *const types.aiScene) []const *const types.aiTexture {
+pub fn sceneTextures(scene: *const types.aiScene) []const ?*types.aiTexture {
     if (scene.mTextures) |ptr| return ptr[0..scene.mNumTextures];
-    return &[_]*const types.aiTexture{};
+    return &[_]?*types.aiTexture{};
 }
 
-pub fn sceneSkeletons(scene: *const types.aiScene) []const *const types.aiSkeleton {
+pub fn sceneSkeletons(scene: *const types.aiScene) []const ?*types.aiSkeleton {
     if (scene.mSkeletons) |ptr| return ptr[0..scene.mNumSkeletons];
-    return &[_]*const types.aiSkeleton{};
+    return &[_]?*types.aiSkeleton{};
 }
 
 pub fn sceneHasMeshes(scene: *const types.aiScene) bool {
@@ -432,9 +432,9 @@ pub fn sceneHasLights(scene: *const types.aiScene) bool {
     return scene.mLights != null and scene.mNumLights > 0;
 }
 
-pub fn nodeChildren(node: *const types.aiNode) []const *const types.aiNode {
+pub fn nodeChildren(node: *const types.aiNode) []const ?*types.aiNode {
     if (node.mChildren) |ptr| return ptr[0..node.mNumChildren];
-    return &[_]*const types.aiNode{};
+    return &[_]?*types.aiNode{};
 }
 
 pub fn nodeMeshIndices(node: *const types.aiNode) []const c_uint {
@@ -483,9 +483,9 @@ pub fn meshFaces(mesh: *const types.aiMesh) ?[]const types.aiFace {
     return ptr[0..mesh.mNumFaces];
 }
 
-pub fn meshBones(mesh: *const types.aiMesh) []const *const types.aiBone {
+pub fn meshBones(mesh: *const types.aiMesh) []const ?*types.aiBone {
     if (mesh.mBones) |ptr| return ptr[0..mesh.mNumBones];
-    return &[_]*const types.aiBone{};
+    return &[_]?*types.aiBone{};
 }
 
 pub const MaterialTextureInfo = extern struct {
@@ -562,19 +562,19 @@ pub fn materialGetTextureInfo(mat: *const types.aiMaterial, type_: types.aiTextu
     };
 }
 
-pub fn animationChannels(anim: *const types.aiAnimation) []const *const types.aiNodeAnim {
+pub fn animationChannels(anim: *const types.aiAnimation) []const ?*types.aiNodeAnim {
     if (anim.mChannels) |ptr| return ptr[0..anim.mNumChannels];
-    return &[_]*const types.aiNodeAnim{};
+    return &[_]?*types.aiNodeAnim{};
 }
 
-pub fn animationMeshChannels(anim: *const types.aiAnimation) []const *const types.aiMeshAnim {
+pub fn animationMeshChannels(anim: *const types.aiAnimation) []const ?*types.aiMeshAnim {
     if (anim.mMeshChannels) |ptr| return ptr[0..anim.mNumMeshChannels];
-    return &[_]*const types.aiMeshAnim{};
+    return &[_]?*types.aiMeshAnim{};
 }
 
-pub fn animationMorphChannels(anim: *const types.aiAnimation) []const *const types.aiMeshMorphAnim {
+pub fn animationMorphChannels(anim: *const types.aiAnimation) []const ?*types.aiMeshMorphAnim {
     if (anim.mMorphMeshChannels) |ptr| return ptr[0..anim.mNumMorphMeshChannels];
-    return &[_]*const types.aiMeshMorphAnim{};
+    return &[_]?*types.aiMeshMorphAnim{};
 }
 
 pub fn nodeAnimPositionKeys(na: *const types.aiNodeAnim) ?[]const types.aiVectorKey {
@@ -593,9 +593,11 @@ pub fn nodeAnimScalingKeys(na: *const types.aiNodeAnim) ?[]const types.aiVectorK
 }
 
 pub fn nodeFindByName(node: *const types.aiNode, name: []const u8) ?*const types.aiNode {
-    if (std.mem.eql(u8, node.mName.toSlice(), name)) return node;
+    if (std.mem.eql(u8, toSlice(&node.mName), name)) return node;
     for (nodeChildren(node)) |child| {
-        if (nodeFindByName(child, name)) |found| return found;
+        if (child) |ch| {
+            if (nodeFindByName(ch, name)) |found| return found;
+        }
     }
     return null;
 }
@@ -604,7 +606,7 @@ pub fn toSlice(s: *const types.aiString) []const u8 {
     return s.data[0..s.length];
 }
 
-pub fn toSlice(face: *const types.aiFace) []const c_uint {
+pub fn faceIndices(face: *const types.aiFace) []const c_uint {
     if (face.mIndices) |ptr| return ptr[0..face.mNumIndices];
     return &[_]c_uint{};
 }
