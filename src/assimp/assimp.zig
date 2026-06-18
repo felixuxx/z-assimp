@@ -73,6 +73,20 @@ pub const aiLightSourceType = types.aiLightSourceType;
 pub const aiMetadataType = types.aiMetadataType;
 pub const aiImporterFlags = types.aiImporterFlags;
 
+pub const ASSIMP_CFLAGS_SHARED = types.ASSIMP_CFLAGS_SHARED;
+pub const ASSIMP_CFLAGS_STLPORT = types.ASSIMP_CFLAGS_STLPORT;
+pub const ASSIMP_CFLAGS_DEBUG = types.ASSIMP_CFLAGS_DEBUG;
+pub const ASSIMP_CFLAGS_NOBOOST = types.ASSIMP_CFLAGS_NOBOOST;
+pub const ASSIMP_CFLAGS_SINGLETHREADED = types.ASSIMP_CFLAGS_SINGLETHREADED;
+pub const ASSIMP_CFLAGS_DOUBLE_SUPPORT = types.ASSIMP_CFLAGS_DOUBLE_SUPPORT;
+pub const AI_MAX_FACE_INDICES = types.AI_MAX_FACE_INDICES;
+pub const AI_MAX_BONE_WEIGHTS = types.AI_MAX_BONE_WEIGHTS;
+pub const AI_MAX_VERTICES = types.AI_MAX_VERTICES;
+pub const AI_MAX_FACES = types.AI_MAX_FACES;
+pub const AI_TEXTURE_TYPE_MAX = types.AI_TEXTURE_TYPE_MAX;
+pub const AI_DEFAULT_MATERIAL_NAME = types.AI_DEFAULT_MATERIAL_NAME;
+pub const AI_EMBEDDED_TEXNAME_PREFIX = types.AI_EMBEDDED_TEXNAME_PREFIX;
+
 pub const aiPostProcessSteps = types.aiPostProcessSteps;
 pub const aiComponent = types.aiComponent;
 
@@ -111,6 +125,28 @@ pub const AI_MATKEY_SHININESS = types.AI_MATKEY_SHININESS;
 pub const AI_MATKEY_METALLIC_FACTOR = types.AI_MATKEY_METALLIC_FACTOR;
 pub const AI_MATKEY_ROUGHNESS_FACTOR = types.AI_MATKEY_ROUGHNESS_FACTOR;
 pub const AI_MATKEY_BASE_COLOR = types.AI_MATKEY_BASE_COLOR;
+pub const AI_MATKEY_COLOR_TRANSPARENT = types.AI_MATKEY_COLOR_TRANSPARENT;
+pub const AI_MATKEY_COLOR_REFLECTIVE = types.AI_MATKEY_COLOR_REFLECTIVE;
+pub const AI_MATKEY_BLEND_FUNC = types.AI_MATKEY_BLEND_FUNC;
+pub const AI_MATKEY_ENABLE_WIREFRAME = types.AI_MATKEY_ENABLE_WIREFRAME;
+pub const AI_MATKEY_REFRACTI = types.AI_MATKEY_REFRACTI;
+pub const AI_MATKEY_SHININESS_STRENGTH = types.AI_MATKEY_SHININESS_STRENGTH;
+pub const AI_MATKEY_REFLECTIVITY = types.AI_MATKEY_REFLECTIVITY;
+pub const AI_MATKEY_BUMPSCALING = types.AI_MATKEY_BUMPSCALING;
+pub const AI_MATKEY_TRANSPARENCYFACTOR = types.AI_MATKEY_TRANSPARENCYFACTOR;
+pub const AI_MATKEY_GLOBAL_BACKGROUND_IMAGE = types.AI_MATKEY_GLOBAL_BACKGROUND_IMAGE;
+pub const AI_MATKEY_SPECULAR_FACTOR = types.AI_MATKEY_SPECULAR_FACTOR;
+pub const AI_MATKEY_GLOSSINESS_FACTOR = types.AI_MATKEY_GLOSSINESS_FACTOR;
+pub const AI_MATKEY_SHEEN_COLOR_FACTOR = types.AI_MATKEY_SHEEN_COLOR_FACTOR;
+pub const AI_MATKEY_SHEEN_ROUGHNESS_FACTOR = types.AI_MATKEY_SHEEN_ROUGHNESS_FACTOR;
+pub const AI_MATKEY_CLEARCOAT_FACTOR = types.AI_MATKEY_CLEARCOAT_FACTOR;
+pub const AI_MATKEY_CLEARCOAT_ROUGHNESS_FACTOR = types.AI_MATKEY_CLEARCOAT_ROUGHNESS_FACTOR;
+pub const AI_MATKEY_TRANSMISSION_FACTOR = types.AI_MATKEY_TRANSMISSION_FACTOR;
+pub const AI_MATKEY_EMISSIVE_INTENSITY = types.AI_MATKEY_EMISSIVE_INTENSITY;
+pub const AI_MATKEY_TEXTURE_BASE = types.AI_MATKEY_TEXTURE_BASE;
+pub const AI_MATKEY_UVWSRC_BASE = types.AI_MATKEY_UVWSRC_BASE;
+pub const AI_MATKEY_TEXOP_BASE = types.AI_MATKEY_TEXOP_BASE;
+pub const AI_MATKEY_MAPPING_BASE = types.AI_MATKEY_MAPPING_BASE;
 
 pub const AI_CONFIG_PP_CT_MAX_SMOOTHING_ANGLE = types.AI_CONFIG_PP_CT_MAX_SMOOTHING_ANGLE;
 pub const AI_CONFIG_PP_RVC_FLAGS = types.AI_CONFIG_PP_RVC_FLAGS;
@@ -143,6 +179,36 @@ pub const mat4Identity = math.mat4Identity;
 pub const quatMul = math.quatMul;
 pub const quatNormalize = math.quatNormalize;
 pub const quatInterpolate = math.quatInterpolate;
+pub const quatConjugate = math.quatConjugate;
+pub const quatFromAxisAngle = math.quatFromAxisAngle;
+pub const quatFromEulerAngles = math.quatFromEulerAngles;
+pub const quatEqual = math.quatEqual;
+pub const vec3NormalizeSafe = math.vec3NormalizeSafe;
+pub const vec3RotateByQuaternion = math.vec3RotateByQuaternion;
+pub const vec3TransformByMatrix3 = math.vec3TransformByMatrix3;
+pub const vec2Equal = math.vec2Equal;
+pub const vec2Normalize = math.vec2Normalize;
+pub const mat3Mul = math.mat3Mul;
+pub const mat3Transpose = math.mat3Transpose;
+pub const mat3Inverse = math.mat3Inverse;
+pub const mat3Determinant = math.mat3Determinant;
+pub const mat3Identity = math.mat3Identity;
+pub const mat3Equal = math.mat3Equal;
+pub const mat3FromMatrix4 = math.mat3FromMatrix4;
+pub const mat3FromQuaternion = math.mat3FromQuaternion;
+pub const mat4Determinant = math.mat4Determinant;
+pub const mat4IsIdentity = math.mat4IsIdentity;
+pub const mat4Equal = math.mat4Equal;
+pub const mat4RotationX = math.mat4RotationX;
+pub const mat4RotationY = math.mat4RotationY;
+pub const mat4RotationZ = math.mat4RotationZ;
+pub const mat4FromEulerAngles = math.mat4FromEulerAngles;
+pub const mat4Translation = math.mat4Translation;
+pub const mat4Scaling = math.mat4Scaling;
+pub const mat4FromTo = math.mat4FromTo;
+pub const mat4Decompose = math.mat4Decompose;
+pub const mat4FromRotationAroundAxis = math.mat4FromRotationAroundAxis;
+pub const mat4FromScalingRotationPosition = math.mat4FromScalingRotationPosition;
 pub const fileio = @import("fileio.zig");
 pub const metadata = @import("metadata.zig");
 pub const MetadataValue = metadata.MetadataValue;
@@ -442,6 +508,16 @@ pub fn getMaterialTexture(mat: *const types.aiMaterial, type_: types.aiTextureTy
     return c.aiGetMaterialTexture(mat, type_, index, path, mapping, uvindex, blend, op, mapmode, flags);
 }
 
+/// Retrieves a raw material property by key. Returns `SUCCESS` if found.
+pub fn getMaterialProperty(mat: *const types.aiMaterial, key: [:0]const u8, type_: c_uint, index: c_uint, prop_out: *?*const types.aiMaterialProperty) types.aiReturn {
+    return c.aiGetMaterialProperty(mat, key.ptr, type_, index, prop_out);
+}
+
+/// Converts an `aiTextureType` enum value to its string name.
+pub fn textureTypeToString(in_: types.aiTextureType) [*:0]const u8 {
+    return c.aiTextureTypeToString(in_);
+}
+
 /// Typed bitfield for `aiScene.mFlags`. Use `sceneFlags(scene)` to obtain.
 pub const SceneFlags = packed struct(u32) {
     incomplete: bool = false,
@@ -461,6 +537,16 @@ pub fn sceneFlags(scene: *const types.aiScene) SceneFlags {
 /// Returns the root node of the scene, or null.
 pub fn sceneRootNode(scene: *const types.aiScene) ?*const types.aiNode {
     return scene.mRootNode;
+}
+
+/// Returns the name of the scene.
+pub fn sceneName(scene: *const types.aiScene) []const u8 {
+    return scene.mName.toSlice();
+}
+
+/// Returns the global metadata of the scene, or null.
+pub fn sceneMetaData(scene: *const types.aiScene) ?*const types.aiMetadata {
+    return scene.mMetaData;
 }
 
 /// Returns all meshes in the scene as a slice. Individual entries may be null.
@@ -540,6 +626,11 @@ pub fn sceneHasLights(scene: *const types.aiScene) bool {
     return scene.mLights != null and scene.mNumLights > 0;
 }
 
+/// Returns true if the scene contains at least one skeleton.
+pub fn sceneHasSkeletons(scene: *const types.aiScene) bool {
+    return scene.mSkeletons != null and scene.mNumSkeletons > 0;
+}
+
 /// Returns the direct children of a node as a slice.
 pub fn nodeChildren(node: *const types.aiNode) []const ?*types.aiNode {
     if (node.mChildren) |ptr| return ptr[0..node.mNumChildren];
@@ -560,6 +651,11 @@ pub fn nodeIsRoot(node: *const types.aiNode) bool {
 /// Returns the parent node, or null if this is the root.
 pub fn nodeParent(node: *const types.aiNode) ?*const types.aiNode {
     return node.mParent;
+}
+
+/// Returns the metadata associated with a node, or null.
+pub fn nodeMetaData(node: *const types.aiNode) ?*const types.aiMetadata {
+    return node.mMetaData;
 }
 
 /// Returns the vertex positions of a mesh, or null if not present.
@@ -610,6 +706,37 @@ pub fn meshFaces(mesh: *const types.aiMesh) ?[]const types.aiFace {
 pub fn meshBones(mesh: *const types.aiMesh) []const ?*types.aiBone {
     if (mesh.mBones) |ptr| return ptr[0..mesh.mNumBones];
     return &[_]?*types.aiBone{};
+}
+
+/// Returns the axis-aligned bounding box of a mesh.
+pub fn meshAABB(mesh: *const types.aiMesh) *const types.aiAABB {
+    return &mesh.mAABB;
+}
+
+/// Returns true if the mesh has vertex colors for the given set (0-7).
+pub fn meshHasVertexColors(mesh: *const types.aiMesh, set: c_uint) bool {
+    if (set >= types.AI_MAX_NUMBER_OF_COLOR_SETS) return false;
+    return mesh.mColors[set] != null and mesh.mNumVertices > 0;
+}
+
+/// Returns true if the mesh has texture coordinates for the given set (0-7).
+pub fn meshHasTextureCoords(mesh: *const types.aiMesh, set: c_uint) bool {
+    if (set >= types.AI_MAX_NUMBER_OF_TEXTURECOORDS) return false;
+    return mesh.mTextureCoords[set] != null and mesh.mNumVertices > 0;
+}
+
+/// Returns the number of UV channels the mesh contains.
+pub fn meshGetNumUVChannels(mesh: *const types.aiMesh) c_uint {
+    var n: c_uint = 0;
+    while (n < types.AI_MAX_NUMBER_OF_TEXTURECOORDS and mesh.mTextureCoords[n] != null) : (n += 1) {}
+    return n;
+}
+
+/// Returns the number of vertex color channels the mesh contains.
+pub fn meshGetNumColorChannels(mesh: *const types.aiMesh) c_uint {
+    var n: c_uint = 0;
+    while (n < types.AI_MAX_NUMBER_OF_COLOR_SETS and mesh.mColors[n] != null) : (n += 1) {}
+    return n;
 }
 
 /// Returns the anim mesh vertex positions, or null if not overridden for this frame.
@@ -878,6 +1005,42 @@ pub fn skeletonBones(skel: *const types.aiSkeleton) []const ?*types.aiSkeletonBo
 /// Returns the name of a skeleton.
 pub fn skeletonName(skel: *const types.aiSkeleton) []const u8 {
     return skel.mName.toSlice();
+}
+
+/// Returns the parent bone index of a skeleton bone (-1 for root).
+pub fn skeletonBoneParent(bone: *const types.aiSkeletonBone) c_int {
+    return bone.mParent;
+}
+
+/// Returns the armature node of a skeleton bone, or null.
+pub fn skeletonBoneArmature(bone: *const types.aiSkeletonBone) ?*const types.aiNode {
+    return if (bone.mArmature) |n| n else null;
+}
+
+/// Returns the bone node of a skeleton bone, or null.
+pub fn skeletonBoneNode(bone: *const types.aiSkeletonBone) ?*const types.aiNode {
+    return if (bone.mNode) |n| n else null;
+}
+
+/// Returns the mesh referenced by a skeleton bone, or null.
+pub fn skeletonBoneMeshId(bone: *const types.aiSkeletonBone) ?*const types.aiMesh {
+    return bone.mMeshId;
+}
+
+/// Returns the per-vertex weights of a skeleton bone, or null.
+pub fn skeletonBoneWeights(bone: *const types.aiSkeletonBone) ?[]const types.aiVertexWeight {
+    const ptr = bone.mWeights orelse return null;
+    return ptr[0..bone.mNumnWeights];
+}
+
+/// Returns the offset matrix of a skeleton bone.
+pub fn skeletonBoneOffsetMatrix(bone: *const types.aiSkeletonBone) *const types.aiMatrix4x4 {
+    return &bone.mOffsetMatrix;
+}
+
+/// Returns the local matrix of a skeleton bone.
+pub fn skeletonBoneLocalMatrix(bone: *const types.aiSkeletonBone) *const types.aiMatrix4x4 {
+    return &bone.mLocalMatrix;
 }
 
 /// Returns the keys of a mesh animation channel, or null.
