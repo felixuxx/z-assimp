@@ -149,11 +149,16 @@ pub const MetadataValue = metadata.MetadataValue;
 
 pub const ImportError = error{ImportFailed};
 
+/// High-level wrapper around the assimp importer C API.
+///
+/// Manages the lifecycle of an imported scene and optional property store.
+/// Create with `init`, import with `importFile`, clean up with `deinit`.
 pub const Importer = struct {
     allocator: std.mem.Allocator,
     scene: ?*const types.aiScene,
     property_store: ?*types.aiPropertyStore,
 
+    /// Creates a new Importer with no loaded scene.
     pub fn init(allocator: std.mem.Allocator) Importer {
         return .{
             .allocator = allocator,
@@ -162,6 +167,7 @@ pub const Importer = struct {
         };
     }
 
+    /// Frees the current scene and any property store.
     pub fn deinit(self: *Importer) void {
         self.releaseScene();
         if (self.property_store) |store| {
@@ -170,6 +176,10 @@ pub const Importer = struct {
         }
     }
 
+    /// Imports a file from disk.
+    /// `path` is a null-terminated file path. `flags` controls post-processing.
+    /// Returns the imported scene, or `ImportError.ImportFailed` on failure.
+    /// Call `releaseScene` or `deinit` when done.
     pub fn importFile(self: *Importer, path: [:0]const u8, flags: types.aiPostProcessSteps) !*const types.aiScene {
         self.releaseScene();
         const scene = c.aiImportFile(path.ptr, @bitCast(flags));
@@ -180,6 +190,8 @@ pub const Importer = struct {
         return error.ImportFailed;
     }
 
+    /// Imports a file with custom I/O callbacks.
+    /// `fs` provides custom file reading; pass `null` for the default filesystem.
     pub fn importFileEx(self: *Importer, path: [:0]const u8, flags: types.aiPostProcessSteps, fs: ?*types.aiFileIO) !*const types.aiScene {
         self.releaseScene();
         const scene = c.aiImportFileEx(path.ptr, @bitCast(flags), fs);
@@ -190,6 +202,7 @@ pub const Importer = struct {
         return error.ImportFailed;
     }
 
+    /// Imports with custom I/O and applies properties set via `setProperty*`.
     pub fn importFileExWithProperties(self: *Importer, path: [:0]const u8, flags: types.aiPostProcessSteps, fs: ?*types.aiFileIO) !*const types.aiScene {
         self.releaseScene();
         const store = self.getOrCreatePropertyStore();
@@ -201,6 +214,8 @@ pub const Importer = struct {
         return error.ImportFailed;
     }
 
+    /// Imports a model from a memory buffer.
+    /// `hint` is a file extension like `"obj"` or `"gltf"` that tells assimp which importer to use.
     pub fn importFileFromMemory(self: *Importer, buffer: []const u8, hint: [:0]const u8, flags: types.aiPostProcessSteps) !*const types.aiScene {
         self.releaseScene();
         const scene = c.aiImportFileFromMemory(buffer.ptr, @as(c_uint, @intCast(buffer.len)), @bitCast(flags), hint.ptr);
@@ -211,6 +226,7 @@ pub const Importer = struct {
         return error.ImportFailed;
     }
 
+    /// Imports from memory with custom properties applied.
     pub fn importFileFromMemoryWithProperties(self: *Importer, buffer: []const u8, hint: [:0]const u8, flags: types.aiPostProcessSteps) !*const types.aiScene {
         self.releaseScene();
         const store = self.getOrCreatePropertyStore();
@@ -222,6 +238,7 @@ pub const Importer = struct {
         return error.ImportFailed;
     }
 
+    /// Applies additional post-processing to the currently imported scene.
     pub fn applyPostProcessing(self: *Importer, flags: types.aiPostProcessSteps) !void {
         const scene = self.scene orelse return;
         const result = c.aiApplyPostProcessing(scene, @bitCast(flags));
@@ -231,6 +248,7 @@ pub const Importer = struct {
         }
     }
 
+    /// Frees the currently imported scene. Safe to call multiple times.
     pub fn releaseScene(self: *Importer) void {
         if (self.scene) |scene| {
             c.aiReleaseImport(scene);
@@ -248,94 +266,116 @@ pub const Importer = struct {
         return self.property_store;
     }
 
+    /// Sets an integer import property (must be called before import).
     pub fn setPropertyInteger(self: *Importer, key: [:0]const u8, value: c_int) void {
         if (self.getOrCreatePropertyStore()) |store|
             c.aiSetImportPropertyInteger(store, key.ptr, value);
     }
 
+    /// Sets a float import property (must be called before import).
     pub fn setPropertyFloat(self: *Importer, key: [:0]const u8, value: types.ai_real) void {
         if (self.getOrCreatePropertyStore()) |store|
             c.aiSetImportPropertyFloat(store, key.ptr, value);
     }
 
+    /// Sets a string import property (must be called before import).
     pub fn setPropertyString(self: *Importer, key: [:0]const u8, value: *const types.aiString) void {
         if (self.getOrCreatePropertyStore()) |store|
             c.aiSetImportPropertyString(store, key.ptr, value);
     }
 
+    /// Sets a matrix import property (must be called before import).
     pub fn setPropertyMatrix(self: *Importer, key: [:0]const u8, value: *const types.aiMatrix4x4) void {
         if (self.getOrCreatePropertyStore()) |store|
             c.aiSetImportPropertyMatrix(store, key.ptr, value);
     }
 
+    /// Returns whether a given file extension (e.g. ".obj") is supported.
     pub fn isExtensionSupported(ext: [:0]const u8) bool {
         return c.aiIsExtensionSupported(ext.ptr) != 0;
     }
 
+    /// Returns a semicolon-separated list of all supported extensions.
     pub fn getExtensionList(buffer: *types.aiString) void {
         c.aiGetExtensionList(buffer);
     }
 
+    /// Returns approximate memory usage of an imported scene.
     pub fn getMemoryRequirements(scene: *const types.aiScene, info: *types.aiMemoryInfo) void {
         c.aiGetMemoryRequirements(scene, info);
     }
 
+    /// Returns a human-readable error string from the last failed import.
     pub fn getErrorString() [*:0]const u8 {
         return c.aiGetErrorString();
     }
 
+    /// Returns the major version number of the linked assimp library.
     pub fn getVersionMajor() c_uint {
         return c.aiGetVersionMajor();
     }
 
+    /// Returns the minor version number of the linked assimp library.
     pub fn getVersionMinor() c_uint {
         return c.aiGetVersionMinor();
     }
 
+    /// Returns the patch version number of the linked assimp library.
     pub fn getVersionPatch() c_uint {
         return c.aiGetVersionPatch();
     }
 
+    /// Returns the SVN revision of the linked assimp library.
     pub fn getVersionRevision() c_uint {
         return c.aiGetVersionRevision();
     }
 
+    /// Returns a bitmask of compile-time flags (ASSIMP_CFLAGS_*).
     pub fn getCompileFlags() c_uint {
         return c.aiGetCompileFlags();
     }
 
+    /// Returns legal/copyright information about assimp.
     pub fn getLegalString() [*:0]const u8 {
         return c.aiGetLegalString();
     }
 
+    /// Returns the branch name of the assimp build.
     pub fn getBranchName() [*:0]const u8 {
         return c.aiGetBranchName();
     }
 
+    /// Returns the number of available import formats.
     pub fn getImportFormatCount() usize {
         return c.aiGetImportFormatCount();
     }
 
+    /// Returns metadata about the nth import format.
     pub fn getImportFormatDescription(index: usize) ?*const types.aiImporterDesc {
         return c.aiGetImportFormatDescription(index);
     }
 
+    /// Returns a predefined log stream (file, stdout, stderr, or debugger).
     pub fn getPredefinedLogStream(stream: types.aiDefaultLogStream, file: ?[:0]const u8) types.aiLogStream {
         return c.aiGetPredefinedLogStream(stream, if (file) |f| f.ptr else null);
     }
 
+    /// Attaches a custom log stream.
     pub fn attachLogStream(stream: *const types.aiLogStream) void {
         c.aiAttachLogStream(stream);
     }
 
+    /// Detaches a previously attached log stream.
     pub fn detachLogStream(stream: *const types.aiLogStream) types.aiReturn {
         return c.aiDetachLogStream(stream);
     }
 
+    /// Detaches all attached log streams.
     pub fn detachAllLogStreams() void {
         c.aiDetachAllLogStreams();
     }
 
+    /// Enables or disables verbose logging.
     pub fn enableVerboseLogging(enabled: bool) void {
         c.aiEnableVerboseLogging(if (enabled) types.AI_TRUE else types.AI_FALSE);
     }
@@ -345,42 +385,52 @@ pub const Importer = struct {
     }
 };
 
+/// Queries a float material property. Returns `SUCCESS` if found.
 pub fn getMaterialFloat(mat: *const types.aiMaterial, key: [:0]const u8, type_: c_uint, index: c_uint, out: *types.ai_real) types.aiReturn {
     return c.aiGetMaterialFloatArray(mat, key.ptr, type_, index, out, null);
 }
 
+/// Queries an integer material property. Returns `SUCCESS` if found.
 pub fn getMaterialInteger(mat: *const types.aiMaterial, key: [:0]const u8, type_: c_uint, index: c_uint, out: *c_int) types.aiReturn {
     return c.aiGetMaterialIntegerArray(mat, key.ptr, type_, index, out, null);
 }
 
+/// Queries a float array material property. `max` is in/out: input is buffer capacity, output is count read.
 pub fn getMaterialFloatArray(mat: *const types.aiMaterial, key: [:0]const u8, type_: c_uint, index: c_uint, out: *types.ai_real, max: ?*c_uint) types.aiReturn {
     return c.aiGetMaterialFloatArray(mat, key.ptr, type_, index, out, max);
 }
 
+/// Queries an integer array material property.
 pub fn getMaterialIntegerArray(mat: *const types.aiMaterial, key: [:0]const u8, type_: c_uint, index: c_uint, out: *c_int, max: ?*c_uint) types.aiReturn {
     return c.aiGetMaterialIntegerArray(mat, key.ptr, type_, index, out, max);
 }
 
+/// Queries a color material property.
 pub fn getMaterialColor(mat: *const types.aiMaterial, key: [:0]const u8, type_: c_uint, index: c_uint, out: *types.aiColor4D) types.aiReturn {
     return c.aiGetMaterialColor(mat, key.ptr, type_, index, out);
 }
 
+/// Queries a UV transform material property.
 pub fn getMaterialUVTransform(mat: *const types.aiMaterial, key: [:0]const u8, type_: c_uint, index: c_uint, out: *types.aiUVTransform) types.aiReturn {
     return c.aiGetMaterialUVTransform(mat, key.ptr, type_, index, out);
 }
 
+/// Queries a string material property.
 pub fn getMaterialString(mat: *const types.aiMaterial, key: [:0]const u8, type_: c_uint, index: c_uint, out: *types.aiString) types.aiReturn {
     return c.aiGetMaterialString(mat, key.ptr, type_, index, out);
 }
 
+/// Returns the number of textures for a given texture type on this material.
 pub fn getMaterialTextureCount(mat: *const types.aiMaterial, type_: types.aiTextureType) c_uint {
     return c.aiGetMaterialTextureCount(mat, type_);
 }
 
+/// Queries a texture slot's parameters. Returns `SUCCESS` if found.
 pub fn getMaterialTexture(mat: *const types.aiMaterial, type_: types.aiTextureType, index: c_uint, path: *types.aiString, mapping: ?*types.aiTextureMapping, uvindex: ?*c_uint, blend: ?*types.ai_real, op: ?*types.aiTextureOp, mapmode: ?[*]types.aiTextureMapMode, flags: ?*c_uint) types.aiReturn {
     return c.aiGetMaterialTexture(mat, type_, index, path, mapping, uvindex, blend, op, mapmode, flags);
 }
 
+/// Typed bitfield for `aiScene.mFlags`. Use `sceneFlags(scene)` to obtain.
 pub const SceneFlags = packed struct(u32) {
     incomplete: bool = false,
     validated: bool = false,
@@ -391,125 +441,151 @@ pub const SceneFlags = packed struct(u32) {
     _: u26 = 0,
 };
 
+/// Returns the scene's flags as a typed struct with named fields.
 pub fn sceneFlags(scene: *const types.aiScene) SceneFlags {
     return @bitCast(scene.mFlags);
 }
 
+/// Returns all meshes in the scene as a slice. Individual entries may be null.
 pub fn sceneMeshes(scene: *const types.aiScene) []const ?*types.aiMesh {
     if (scene.mMeshes) |ptr| return ptr[0..scene.mNumMeshes];
     return &[_]?*types.aiMesh{};
 }
 
+/// Returns all materials in the scene as a slice.
 pub fn sceneMaterials(scene: *const types.aiScene) []const ?*types.aiMaterial {
     if (scene.mMaterials) |ptr| return ptr[0..scene.mNumMaterials];
     return &[_]?*types.aiMaterial{};
 }
 
+/// Returns all animations in the scene as a slice.
 pub fn sceneAnimations(scene: *const types.aiScene) []const ?*types.aiAnimation {
     if (scene.mAnimations) |ptr| return ptr[0..scene.mNumAnimations];
     return &[_]?*types.aiAnimation{};
 }
 
+/// Returns all cameras in the scene as a slice.
 pub fn sceneCameras(scene: *const types.aiScene) []const ?*types.aiCamera {
     if (scene.mCameras) |ptr| return ptr[0..scene.mNumCameras];
     return &[_]?*types.aiCamera{};
 }
 
+/// Returns all lights in the scene as a slice.
 pub fn sceneLights(scene: *const types.aiScene) []const ?*types.aiLight {
     if (scene.mLights) |ptr| return ptr[0..scene.mNumLights];
     return &[_]?*types.aiLight{};
 }
 
+/// Returns all embedded textures in the scene as a slice.
 pub fn sceneTextures(scene: *const types.aiScene) []const ?*types.aiTexture {
     if (scene.mTextures) |ptr| return ptr[0..scene.mNumTextures];
     return &[_]?*types.aiTexture{};
 }
 
+/// Returns all skeletons in the scene as a slice.
 pub fn sceneSkeletons(scene: *const types.aiScene) []const ?*types.aiSkeleton {
     if (scene.mSkeletons) |ptr| return ptr[0..scene.mNumSkeletons];
     return &[_]?*types.aiSkeleton{};
 }
 
+/// Returns true if the scene contains at least one mesh.
 pub fn sceneHasMeshes(scene: *const types.aiScene) bool {
     return scene.mMeshes != null and scene.mNumMeshes > 0;
 }
 
+/// Returns true if the scene contains at least one material.
 pub fn sceneHasMaterials(scene: *const types.aiScene) bool {
     return scene.mMaterials != null and scene.mNumMaterials > 0;
 }
 
+/// Returns true if the scene contains at least one embedded texture.
 pub fn sceneHasTextures(scene: *const types.aiScene) bool {
     return scene.mTextures != null and scene.mNumTextures > 0;
 }
 
+/// Returns true if the scene contains at least one animation.
 pub fn sceneHasAnimations(scene: *const types.aiScene) bool {
     return scene.mAnimations != null and scene.mNumAnimations > 0;
 }
 
+/// Returns true if the scene contains at least one camera.
 pub fn sceneHasCameras(scene: *const types.aiScene) bool {
     return scene.mCameras != null and scene.mNumCameras > 0;
 }
 
+/// Returns true if the scene contains at least one light.
 pub fn sceneHasLights(scene: *const types.aiScene) bool {
     return scene.mLights != null and scene.mNumLights > 0;
 }
 
+/// Returns the direct children of a node as a slice.
 pub fn nodeChildren(node: *const types.aiNode) []const ?*types.aiNode {
     if (node.mChildren) |ptr| return ptr[0..node.mNumChildren];
     return &[_]?*types.aiNode{};
 }
 
+/// Returns the mesh indices referenced by a node.
 pub fn nodeMeshIndices(node: *const types.aiNode) []const c_uint {
     if (node.mMeshes) |ptr| return ptr[0..node.mNumMeshes];
     return &[_]c_uint{};
 }
 
+/// Returns true if this node is the scene root (no parent).
 pub fn nodeIsRoot(node: *const types.aiNode) bool {
     return node.mParent == null;
 }
 
+/// Returns the vertex positions of a mesh, or null if not present.
 pub fn meshVertices(mesh: *const types.aiMesh) ?[]const types.aiVector3D {
     const ptr = mesh.mVertices orelse return null;
     return ptr[0..mesh.mNumVertices];
 }
 
+/// Returns the vertex normals, or null if not present.
 pub fn meshNormals(mesh: *const types.aiMesh) ?[]const types.aiVector3D {
     const ptr = mesh.mNormals orelse return null;
     return ptr[0..mesh.mNumVertices];
 }
 
+/// Returns the vertex tangents, or null if not present.
 pub fn meshTangents(mesh: *const types.aiMesh) ?[]const types.aiVector3D {
     const ptr = mesh.mTangents orelse return null;
     return ptr[0..mesh.mNumVertices];
 }
 
+/// Returns the vertex bitangents, or null if not present.
 pub fn meshBitangents(mesh: *const types.aiMesh) ?[]const types.aiVector3D {
     const ptr = mesh.mBitangents orelse return null;
     return ptr[0..mesh.mNumVertices];
 }
 
+/// Returns vertex colors for a given color set (0-7), or null if not present.
 pub fn meshColors(mesh: *const types.aiMesh, set: c_uint) ?[]const types.aiColor4D {
     if (set >= types.AI_MAX_NUMBER_OF_COLOR_SETS) return null;
     const ptr = mesh.mColors[set] orelse return null;
     return ptr[0..mesh.mNumVertices];
 }
 
+/// Returns texture coordinates for a given UV set (0-7), or null if not present.
 pub fn meshTexCoords(mesh: *const types.aiMesh, set: c_uint) ?[]const types.aiVector3D {
     if (set >= types.AI_MAX_NUMBER_OF_TEXTURECOORDS) return null;
     const ptr = mesh.mTextureCoords[set] orelse return null;
     return ptr[0..mesh.mNumVertices];
 }
 
+/// Returns the face list, or null if not present.
 pub fn meshFaces(mesh: *const types.aiMesh) ?[]const types.aiFace {
     const ptr = mesh.mFaces orelse return null;
     return ptr[0..mesh.mNumFaces];
 }
 
+/// Returns the bone array as a slice. Individual entries may be null.
 pub fn meshBones(mesh: *const types.aiMesh) []const ?*types.aiBone {
     if (mesh.mBones) |ptr| return ptr[0..mesh.mNumBones];
     return &[_]?*types.aiBone{};
 }
 
+/// Describes a single texture slot's parameters. Obtained via `materialGetTextureInfo`.
 pub const MaterialTextureInfo = extern struct {
     path: types.aiString,
     mapping: types.aiTextureMapping,
@@ -521,6 +597,7 @@ pub const MaterialTextureInfo = extern struct {
     flags: c_uint,
 };
 
+/// Returns a float material property, or null if not found.
 pub fn materialGetFloat(mat: *const types.aiMaterial, key: [:0]const u8, type_: c_uint, index: c_uint) ?types.ai_real {
     var out: types.ai_real = undefined;
     return switch (c.aiGetMaterialFloatArray(mat, key.ptr, type_, index, &out, null)) {
@@ -529,6 +606,7 @@ pub fn materialGetFloat(mat: *const types.aiMaterial, key: [:0]const u8, type_: 
     };
 }
 
+/// Returns an integer material property, or null if not found.
 pub fn materialGetInteger(mat: *const types.aiMaterial, key: [:0]const u8, type_: c_uint, index: c_uint) ?c_int {
     var out: c_int = undefined;
     return switch (c.aiGetMaterialIntegerArray(mat, key.ptr, type_, index, &out, null)) {
@@ -537,6 +615,7 @@ pub fn materialGetInteger(mat: *const types.aiMaterial, key: [:0]const u8, type_
     };
 }
 
+/// Returns a color material property, or null if not found.
 pub fn materialGetColor(mat: *const types.aiMaterial, key: [:0]const u8, type_: c_uint, index: c_uint) ?types.aiColor4D {
     var out: types.aiColor4D = undefined;
     return switch (c.aiGetMaterialColor(mat, key.ptr, type_, index, &out)) {
@@ -545,6 +624,7 @@ pub fn materialGetColor(mat: *const types.aiMaterial, key: [:0]const u8, type_: 
     };
 }
 
+/// Returns a string material property, or null if not found.
 pub fn materialGetString(mat: *const types.aiMaterial, key: [:0]const u8, type_: c_uint, index: c_uint) ?types.aiString {
     var out: types.aiString = undefined;
     return switch (c.aiGetMaterialString(mat, key.ptr, type_, index, &out)) {
@@ -553,6 +633,7 @@ pub fn materialGetString(mat: *const types.aiMaterial, key: [:0]const u8, type_:
     };
 }
 
+/// Returns a UV transform material property, or null if not found.
 pub fn materialGetUVTransform(mat: *const types.aiMaterial, key: [:0]const u8, type_: c_uint, index: c_uint) ?types.aiUVTransform {
     var out: types.aiUVTransform = undefined;
     return switch (c.aiGetMaterialUVTransform(mat, key.ptr, type_, index, &out)) {
@@ -561,6 +642,7 @@ pub fn materialGetUVTransform(mat: *const types.aiMaterial, key: [:0]const u8, t
     };
 }
 
+/// Returns a texture slot's full info (path, mapping, UV index, blend, op, flags), or null.
 pub fn materialGetTextureInfo(mat: *const types.aiMaterial, type_: types.aiTextureType, index: c_uint) ?MaterialTextureInfo {
     var path: types.aiString = undefined;
     var mapping: types.aiTextureMapping = undefined;
@@ -584,36 +666,44 @@ pub fn materialGetTextureInfo(mat: *const types.aiMaterial, type_: types.aiTextu
     };
 }
 
+/// Returns bone animation channels for an animation.
 pub fn animationChannels(anim: *const types.aiAnimation) []const ?*types.aiNodeAnim {
     if (anim.mChannels) |ptr| return ptr[0..anim.mNumChannels];
     return &[_]?*types.aiNodeAnim{};
 }
 
+/// Returns mesh animation channels for an animation.
 pub fn animationMeshChannels(anim: *const types.aiAnimation) []const ?*types.aiMeshAnim {
     if (anim.mMeshChannels) |ptr| return ptr[0..anim.mNumMeshChannels];
     return &[_]?*types.aiMeshAnim{};
 }
 
+/// Returns morph mesh animation channels for an animation.
 pub fn animationMorphChannels(anim: *const types.aiAnimation) []const ?*types.aiMeshMorphAnim {
     if (anim.mMorphMeshChannels) |ptr| return ptr[0..anim.mNumMorphMeshChannels];
     return &[_]?*types.aiMeshMorphAnim{};
 }
 
+/// Returns the position keyframes of a node animation channel, or null.
 pub fn nodeAnimPositionKeys(na: *const types.aiNodeAnim) ?[]const types.aiVectorKey {
     const ptr = na.mPositionKeys orelse return null;
     return ptr[0..na.mNumPositionKeys];
 }
 
+/// Returns the rotation keyframes of a node animation channel, or null.
 pub fn nodeAnimRotationKeys(na: *const types.aiNodeAnim) ?[]const types.aiQuatKey {
     const ptr = na.mRotationKeys orelse return null;
     return ptr[0..na.mNumRotationKeys];
 }
 
+/// Returns the scaling keyframes of a node animation channel, or null.
 pub fn nodeAnimScalingKeys(na: *const types.aiNodeAnim) ?[]const types.aiVectorKey {
     const ptr = na.mScalingKeys orelse return null;
     return ptr[0..na.mNumScalingKeys];
 }
 
+/// Searches the node hierarchy depth-first for a node with the given name.
+/// Returns null if not found. Uses recursive traversal.
 pub fn nodeFindByName(node: *const types.aiNode, name: []const u8) ?*const types.aiNode {
     if (std.mem.eql(u8, node.mName.toSlice(), name)) return node;
     for (nodeChildren(node)) |child| {
@@ -624,79 +714,99 @@ pub fn nodeFindByName(node: *const types.aiNode, name: []const u8) ?*const types
     return null;
 }
 
+/// Returns the vertex indices of a face as a slice.
 pub fn faceIndices(face: *const types.aiFace) []const c_uint {
     return face.toSlice();
 }
 
+/// Returns the name of a bone.
 pub fn boneName(bone: *const types.aiBone) []const u8 {
     return bone.mName.toSlice();
 }
 
+/// Returns the per-vertex weights of a bone as a slice, or null.
 pub fn boneWeights(bone: *const types.aiBone) ?[]const types.aiVertexWeight {
     const ptr = bone.mWeights orelse return null;
     return ptr[0..bone.mNumWeights];
 }
 
+/// Returns the bone's offset (inverse bind pose) matrix.
 pub fn boneOffsetMatrix(bone: *const types.aiBone) *const types.aiMatrix4x4 {
     return &bone.mOffsetMatrix;
 }
 
+/// Returns the name of an animation.
 pub fn animName(anim: *const types.aiAnimation) []const u8 {
     return anim.mName.toSlice();
 }
 
+/// Returns the duration of an animation in ticks.
 pub fn animDuration(anim: *const types.aiAnimation) f64 {
     return anim.mDuration;
 }
 
+/// Returns the ticks-per-second of an animation (0 if unspecified).
 pub fn animTicksPerSecond(anim: *const types.aiAnimation) f64 {
     return anim.mTicksPerSecond;
 }
 
+/// Returns the name of the target node for this animation channel.
 pub fn nodeAnimChannelName(na: *const types.aiNodeAnim) []const u8 {
     return na.mNodeName.toSlice();
 }
 
+/// Returns the bones of a skeleton as a slice.
 pub fn skeletonBones(skel: *const types.aiSkeleton) []const ?*types.aiSkeletonBone {
     if (skel.mBones) |ptr| return ptr[0..skel.mNumBones];
     return &[_]?*types.aiSkeletonBone{};
 }
 
+/// Returns the name of a skeleton.
 pub fn skeletonName(skel: *const types.aiSkeleton) []const u8 {
     return skel.mName.toSlice();
 }
 
+/// Returns the keys of a mesh animation channel, or null.
 pub fn meshAnimKeys(ma: *const types.aiMeshAnim) ?[]const types.aiMeshKey {
     const ptr = ma.mKeys orelse return null;
     return ptr[0..ma.mNumKeys];
 }
 
+/// Returns the keys of a morph mesh animation channel, or null.
 pub fn meshMorphAnimKeys(mma: *const types.aiMeshMorphAnim) ?[]const types.aiMeshMorphKey {
     const ptr = mma.mKeys orelse return null;
     return ptr[0..mma.mNumKeys];
 }
 
+/// Returns the number of UV components (1-3) for a given texture coordinate set.
 pub fn meshUVComponentCount(mesh: *const types.aiMesh, set: c_uint) c_uint {
     if (set >= types.AI_MAX_NUMBER_OF_TEXTURECOORDS) return 0;
     return mesh.mNumUVComponents[set];
 }
 
+/// Returns the armature node associated with this bone, or null.
 pub fn boneArmature(bone: *const types.aiBone) ?*const types.aiNode {
     return if (bone.mArmature) |n| n else null;
 }
 
+/// Returns the bone node in the scene, or null (requires `PopulateArmatureData` process).
 pub fn boneNode(bone: *const types.aiBone) ?*const types.aiNode {
     return if (bone.mNode) |n| n else null;
 }
 
+/// Returns the pre-state behaviour of a node animation channel.
 pub fn nodeAnimPreState(na: *const types.aiNodeAnim) types.aiAnimBehaviour {
     return na.mPreState;
 }
 
+/// Returns the post-state behaviour of a node animation channel.
 pub fn nodeAnimPostState(na: *const types.aiNodeAnim) types.aiAnimBehaviour {
     return na.mPostState;
 }
 
+/// Returns embedded texture data as bytes.
+/// For compressed textures (`mHeight == 0`), returns the file data.
+/// For uncompressed RGBA8 textures, returns `width * height * 4` bytes.
 pub fn textureData(tex: *const types.aiTexture) ?[]const u8 {
     const ptr = tex.pcData orelse return null;
     const bytes = @as([*]const u8, @ptrCast(ptr));

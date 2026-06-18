@@ -315,23 +315,27 @@ pub const aiProcessPreset_TargetRealtime_MaxQuality: c_uint = @bitCast(aiPostPro
     .optimize_meshes = true,
 });
 
+/// 2D vector with `x` and `y` components.
 pub const aiVector2D = extern struct {
     x: ai_real,
     y: ai_real,
 };
 
+/// 3D vector with `x`, `y`, and `z` components.
 pub const aiVector3D = extern struct {
     x: ai_real,
     y: ai_real,
     z: ai_real,
 };
 
+/// RGB color with `r`, `g`, `b` components in range [0, 1].
 pub const aiColor3D = extern struct {
     r: ai_real,
     g: ai_real,
     b: ai_real,
 };
 
+/// RGBA color with `r`, `g`, `b`, `a` components in range [0, 1].
 pub const aiColor4D = extern struct {
     r: ai_real,
     g: ai_real,
@@ -339,12 +343,14 @@ pub const aiColor4D = extern struct {
     a: ai_real,
 };
 
+/// 3x3 row-major matrix with fields `a1`-`c3`.
 pub const aiMatrix3x3 = extern struct {
     a1: ai_real, a2: ai_real, a3: ai_real,
     b1: ai_real, b2: ai_real, b3: ai_real,
     c1: ai_real, c2: ai_real, c3: ai_real,
 };
 
+/// 4x4 row-major matrix with fields `a1`-`d4`.
 pub const aiMatrix4x4 = extern struct {
     a1: ai_real, a2: ai_real, a3: ai_real, a4: ai_real,
     b1: ai_real, b2: ai_real, b3: ai_real, b4: ai_real,
@@ -352,6 +358,7 @@ pub const aiMatrix4x4 = extern struct {
     d1: ai_real, d2: ai_real, d3: ai_real, d4: ai_real,
 };
 
+/// Quaternion with `w`, `x`, `y`, `z` components (w is the real part).
 pub const aiQuaternion = extern struct {
     w: ai_real,
     x: ai_real,
@@ -359,6 +366,7 @@ pub const aiQuaternion = extern struct {
     z: ai_real,
 };
 
+/// Plane equation: `a*x + b*y + c*z + d = 0`.
 pub const aiPlane = extern struct {
     a: ai_real,
     b: ai_real,
@@ -366,16 +374,19 @@ pub const aiPlane = extern struct {
     d: ai_real,
 };
 
+/// Ray with origin `pos` and direction `dir`.
 pub const aiRay = extern struct {
     pos: aiVector3D,
     dir: aiVector3D,
 };
 
+/// Axis-aligned bounding box defined by `mMin` and `mMax` corners.
 pub const aiAABB = extern struct {
     mMin: aiVector3D,
     mMax: aiVector3D,
 };
 
+/// UV coordinate transformation (translation, scaling, rotation).
 pub const aiUVTransform = extern struct {
     mTranslation: aiVector2D,
     mScaling: aiVector2D,
@@ -452,6 +463,7 @@ pub const aiVertexWeight = extern struct {
     mWeight: ai_real,
 };
 
+/// A node in the imported scene hierarchy.
 pub const aiNode = extern struct {
     mName: aiString,
     mTransformation: aiMatrix4x4,
@@ -484,6 +496,7 @@ pub const aiAnimMesh = extern struct {
     mWeight: f32,
 };
 
+/// A mesh with vertices, faces, bones, and material reference.
 pub const aiMesh = extern struct {
     mPrimitiveTypes: c_uint,
     mNumVertices: c_uint,
@@ -585,6 +598,7 @@ pub const aiMeshMorphAnim = extern struct {
     mKeys: ?[*]aiMeshMorphKey,
 };
 
+/// An animation consisting of keyframe data for multiple nodes/meshes.
 pub const aiAnimation = extern struct {
     mName: aiString,
     mDuration: f64,
@@ -652,6 +666,7 @@ pub const aiMetadata = extern struct {
     mValues: ?[*]aiMetadataEntry,
 };
 
+/// Root data structure returned by the importer. Contains all meshes, materials, animations, etc.
 pub const aiScene = extern struct {
     mFlags: c_uint,
     mRootNode: ?*aiNode,
