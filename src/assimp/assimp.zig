@@ -458,6 +458,11 @@ pub fn sceneFlags(scene: *const types.aiScene) SceneFlags {
     return @bitCast(scene.mFlags);
 }
 
+/// Returns the root node of the scene, or null.
+pub fn sceneRootNode(scene: *const types.aiScene) ?*const types.aiNode {
+    return scene.mRootNode;
+}
+
 /// Returns all meshes in the scene as a slice. Individual entries may be null.
 pub fn sceneMeshes(scene: *const types.aiScene) []const ?*types.aiMesh {
     if (scene.mMeshes) |ptr| return ptr[0..scene.mNumMeshes];
@@ -492,6 +497,11 @@ pub fn sceneLights(scene: *const types.aiScene) []const ?*types.aiLight {
 pub fn sceneTextures(scene: *const types.aiScene) []const ?*types.aiTexture {
     if (scene.mTextures) |ptr| return ptr[0..scene.mNumTextures];
     return &[_]?*types.aiTexture{};
+}
+
+/// Returns the filename of an embedded texture.
+pub fn textureFilename(tex: *const types.aiTexture) []const u8 {
+    return tex.mFilename.toSlice();
 }
 
 /// Returns all skeletons in the scene as a slice.
@@ -648,6 +658,12 @@ pub fn animMeshName(am: *const types.aiAnimMesh) []const u8 {
 /// Returns the blend weight of an anim mesh.
 pub fn animMeshWeight(am: *const types.aiAnimMesh) f32 {
     return am.mWeight;
+}
+
+/// Returns the animation meshes attached to a mesh as a slice.
+pub fn meshAnimMeshes(mesh: *const types.aiMesh) []const ?*types.aiAnimMesh {
+    if (mesh.mAnimMeshes) |ptr| return ptr[0..mesh.mNumAnimMeshes];
+    return &[_]?*types.aiAnimMesh{};
 }
 
 /// Describes a single texture slot's parameters. Obtained via `materialGetTextureInfo`.
@@ -840,6 +856,12 @@ pub fn animDuration(anim: *const types.aiAnimation) f64 {
 /// Returns the ticks-per-second of an animation (0 if unspecified).
 pub fn animTicksPerSecond(anim: *const types.aiAnimation) f64 {
     return anim.mTicksPerSecond;
+}
+
+/// Returns the duration of an animation in seconds (duration / ticksPerSecond).
+pub fn animationDurationSeconds(anim: *const types.aiAnimation) f64 {
+    if (anim.mTicksPerSecond == 0) return anim.mDuration;
+    return anim.mDuration / anim.mTicksPerSecond;
 }
 
 /// Returns the name of the target node for this animation channel.
