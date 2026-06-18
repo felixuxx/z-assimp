@@ -207,6 +207,22 @@ pub fn build(b: *std.Build) !void {
     }
     const run_test = b.addRunArtifact(test_exe);
     test_step.dependOn(&run_test.step);
+
+    const example_zig = b.addExecutable(.{
+        .name = "static-example-zig",
+        .root_module = b.createModule(.{
+            .target = target,
+            .optimize = optimize,
+            .root_source_file = b.path("src/example.zig"),
+        }),
+    });
+    example_zig.root_module.addImport("assimp", assimp_mod);
+    example_zig.root_module.linkLibrary(lib);
+    example_zig.root_module.link_libc = true;
+    if (target.result.abi != .msvc) {
+        example_zig.root_module.link_libcpp = true;
+    }
+    b.installArtifact(example_zig);
 }
 
 const unsupported_formats = [_][]const u8{
