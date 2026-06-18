@@ -671,4 +671,23 @@ pub fn skeletonName(skel: *const types.aiSkeleton) []const u8 {
     return toSlice(&skel.mName);
 }
 
+pub fn meshAnimKeys(ma: *const types.aiMeshAnim) ?[]const types.aiMeshKey {
+    const ptr = ma.mKeys orelse return null;
+    return ptr[0..ma.mNumKeys];
+}
+
+pub fn meshMorphAnimKeys(mma: *const types.aiMeshMorphAnim) ?[]const types.aiMeshMorphKey {
+    const ptr = mma.mKeys orelse return null;
+    return ptr[0..mma.mNumKeys];
+}
+
+pub fn textureData(tex: *const types.aiTexture) ?[]const u8 {
+    const ptr = tex.pcData orelse return null;
+    const bytes = @as([*]const u8, @ptrCast(ptr));
+    if (tex.mHeight == 0) {
+        return bytes[0..tex.mWidth];
+    }
+    return bytes[0 .. tex.mWidth * tex.mHeight * @sizeOf(types.aiTexel)];
+}
+
 const std = @import("std");
