@@ -547,6 +547,11 @@ pub fn nodeIsRoot(node: *const types.aiNode) bool {
     return node.mParent == null;
 }
 
+/// Returns the parent node, or null if this is the root.
+pub fn nodeParent(node: *const types.aiNode) ?*const types.aiNode {
+    return node.mParent;
+}
+
 /// Returns the vertex positions of a mesh, or null if not present.
 pub fn meshVertices(mesh: *const types.aiMesh) ?[]const types.aiVector3D {
     const ptr = mesh.mVertices orelse return null;
@@ -595,6 +600,54 @@ pub fn meshFaces(mesh: *const types.aiMesh) ?[]const types.aiFace {
 pub fn meshBones(mesh: *const types.aiMesh) []const ?*types.aiBone {
     if (mesh.mBones) |ptr| return ptr[0..mesh.mNumBones];
     return &[_]?*types.aiBone{};
+}
+
+/// Returns the anim mesh vertex positions, or null if not overridden for this frame.
+pub fn animMeshVertices(am: *const types.aiAnimMesh) ?[]const types.aiVector3D {
+    const ptr = am.mVertices orelse return null;
+    return ptr[0..am.mNumVertices];
+}
+
+/// Returns the anim mesh normals, or null if not overridden.
+pub fn animMeshNormals(am: *const types.aiAnimMesh) ?[]const types.aiVector3D {
+    const ptr = am.mNormals orelse return null;
+    return ptr[0..am.mNumVertices];
+}
+
+/// Returns the anim mesh tangents, or null if not overridden.
+pub fn animMeshTangents(am: *const types.aiAnimMesh) ?[]const types.aiVector3D {
+    const ptr = am.mTangents orelse return null;
+    return ptr[0..am.mNumVertices];
+}
+
+/// Returns the anim mesh bitangents, or null if not overridden.
+pub fn animMeshBitangents(am: *const types.aiAnimMesh) ?[]const types.aiVector3D {
+    const ptr = am.mBitangents orelse return null;
+    return ptr[0..am.mNumVertices];
+}
+
+/// Returns vertex colors for a given color set (0-7) on an anim mesh, or null.
+pub fn animMeshColors(am: *const types.aiAnimMesh, set: c_uint) ?[]const types.aiColor4D {
+    if (set >= types.AI_MAX_NUMBER_OF_COLOR_SETS) return null;
+    const ptr = am.mColors[set] orelse return null;
+    return ptr[0..am.mNumVertices];
+}
+
+/// Returns texture coordinates for a given UV set (0-7) on an anim mesh, or null.
+pub fn animMeshTexCoords(am: *const types.aiAnimMesh, set: c_uint) ?[]const types.aiVector3D {
+    if (set >= types.AI_MAX_NUMBER_OF_TEXTURECOORDS) return null;
+    const ptr = am.mTextureCoords[set] orelse return null;
+    return ptr[0..am.mNumVertices];
+}
+
+/// Returns the name of an anim mesh.
+pub fn animMeshName(am: *const types.aiAnimMesh) []const u8 {
+    return am.mName.toSlice();
+}
+
+/// Returns the blend weight of an anim mesh.
+pub fn animMeshWeight(am: *const types.aiAnimMesh) f32 {
+    return am.mWeight;
 }
 
 /// Describes a single texture slot's parameters. Obtained via `materialGetTextureInfo`.
