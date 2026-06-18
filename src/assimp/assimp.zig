@@ -611,4 +611,42 @@ pub fn faceIndices(face: *const types.aiFace) []const c_uint {
     return &[_]c_uint{};
 }
 
+pub fn boneName(bone: *const types.aiBone) []const u8 {
+    return toSlice(&bone.mName);
+}
+
+pub fn boneWeights(bone: *const types.aiBone) ?[]const types.aiVertexWeight {
+    const ptr = bone.mWeights orelse return null;
+    return ptr[0..bone.mNumWeights];
+}
+
+pub fn boneOffsetMatrix(bone: *const types.aiBone) *const types.aiMatrix4x4 {
+    return &bone.mOffsetMatrix;
+}
+
+pub fn animName(anim: *const types.aiAnimation) []const u8 {
+    return toSlice(&anim.mName);
+}
+
+pub fn animDuration(anim: *const types.aiAnimation) f64 {
+    return anim.mDuration;
+}
+
+pub fn animTicksPerSecond(anim: *const types.aiAnimation) f64 {
+    return anim.mTicksPerSecond;
+}
+
+pub fn nodeAnimChannelName(na: *const types.aiNodeAnim) []const u8 {
+    return toSlice(&na.mNodeName);
+}
+
+pub fn skeletonBones(skel: *const types.aiSkeleton) []const ?*types.aiSkeletonBone {
+    if (skel.mBones) |ptr| return ptr[0..skel.mNumBones];
+    return &[_]?*types.aiSkeletonBone{};
+}
+
+pub fn skeletonName(skel: *const types.aiSkeleton) []const u8 {
+    return toSlice(&skel.mName);
+}
+
 const std = @import("std");
