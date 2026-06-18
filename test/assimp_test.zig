@@ -194,3 +194,49 @@ test "memory FileIO construction" {
     const pos = file.TellProc(&file);
     try std.testing.expectEqual(@as(usize, 5), pos);
 }
+
+test "aiString.fromSlice and toSlice roundtrip" {
+    const original = "hello";
+    const s = assimp.aiString.fromSlice(original);
+    try std.testing.expectEqual(@as(u32, @intCast(original.len)), s.length);
+    try std.testing.expectEqualStrings(original, s.toSlice());
+}
+
+test "sceneRootNode and nodeParent" {
+    var importer = assimp.Importer.init(std.testing.allocator);
+    defer importer.deinit();
+    const scene = try importer.importFileFromMemory(box_obj, "obj", .{ .triangulate = true });
+    const root = assimp.sceneRootNode(scene) orelse return error.SkipZigTest;
+    try std.testing.expect(assimp.nodeIsRoot(root));
+    try std.testing.expect(assimp.nodeParent(root) == null);
+}
+
+test "animationDurationSeconds with no animations" {
+    var importer = assimp.Importer.init(std.testing.allocator);
+    defer importer.deinit();
+    const scene = try importer.importFileFromMemory(box_obj, "obj", .{ .triangulate = true });
+    for (assimp.sceneAnimations(scene)) |anim_opt| {
+        const anim = anim_opt orelse continue;
+        _ = assimp.animationDurationSeconds(anim);
+    }
+}
+
+test "mesh primitives" {
+    var importer = assimp.Importer.init(std.testing.allocator);
+    defer importer.deinit();
+    const scene = try importer.importFileFromMemory(box_obj, "obj", .{ .triangulate = true });
+    const mesh = assimp.sceneMeshes(scene)[0] orelse return error.SkipZigTest;
+    try std.testing.expect(mesh.mNumFaces > 0);
+    const bones = assimp.meshBones(mesh);
+    try std.testing.expect(bones.len == 0);
+    const anim_meshes = assimp.meshAnimMeshes(mesh);
+    try std.testing.expect(anim_meshes.len == 0);
+}
+
+test "export format description" {
+    const count = assimp.Exporter.getExportFormatCount();
+    if (count > 0) {
+        const desc = assimp.Exporter.getExportFormatDescription(0);
+        try std.testing.expect(desc != null);
+    }
+}
