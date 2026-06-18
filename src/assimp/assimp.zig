@@ -676,6 +676,27 @@ pub fn meshMorphAnimKeys(mma: *const types.aiMeshMorphAnim) ?[]const types.aiMes
     return ptr[0..mma.mNumKeys];
 }
 
+pub fn meshUVComponentCount(mesh: *const types.aiMesh, set: c_uint) c_uint {
+    if (set >= types.AI_MAX_NUMBER_OF_TEXTURECOORDS) return 0;
+    return mesh.mNumUVComponents[set];
+}
+
+pub fn boneArmature(bone: *const types.aiBone) ?*const types.aiNode {
+    return if (bone.mArmature) |n| n else null;
+}
+
+pub fn boneNode(bone: *const types.aiBone) ?*const types.aiNode {
+    return if (bone.mNode) |n| n else null;
+}
+
+pub fn nodeAnimPreState(na: *const types.aiNodeAnim) types.aiAnimBehaviour {
+    return na.mPreState;
+}
+
+pub fn nodeAnimPostState(na: *const types.aiNodeAnim) types.aiAnimBehaviour {
+    return na.mPostState;
+}
+
 pub fn textureData(tex: *const types.aiTexture) ?[]const u8 {
     const ptr = tex.pcData orelse return null;
     const bytes = @as([*]const u8, @ptrCast(ptr));
