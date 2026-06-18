@@ -240,3 +240,82 @@ test "export format description" {
         try std.testing.expect(desc != null);
     }
 }
+
+test "textureTypeToString" {
+    const s = assimp.textureTypeToString(.DIFFUSE);
+    _ = s;
+}
+
+test "property store creation" {
+    const store = assimp.c.aiCreatePropertyStore();
+    defer assimp.c.aiReleasePropertyStore(store);
+    try std.testing.expect(store != null);
+    assimp.c.aiSetImportPropertyInteger(store, "test", 42);
+}
+
+test "mesh feature checks" {
+    var importer = assimp.Importer.init(std.testing.allocator);
+    defer importer.deinit();
+    const scene = try importer.importFileFromMemory(box_obj, "obj", .{ .triangulate = true });
+    const mesh = assimp.sceneMeshes(scene)[0] orelse return error.SkipZigTest;
+
+    try std.testing.expect(!assimp.meshHasVertexColors(mesh, 0));
+    try std.testing.expect(!assimp.meshHasTextureCoords(mesh, 0));
+    try std.testing.expectEqual(@as(c_uint, 0), assimp.meshGetNumUVChannels(mesh));
+    try std.testing.expectEqual(@as(c_uint, 0), assimp.meshGetNumColorChannels(mesh));
+    _ = assimp.meshAABB(mesh);
+}
+
+test "scene accessor consistency" {
+    var importer = assimp.Importer.init(std.testing.allocator);
+    defer importer.deinit();
+    const scene = try importer.importFileFromMemory(box_obj, "obj", .{ .triangulate = true });
+
+    _ = assimp.sceneName(scene);
+    _ = assimp.sceneMetaData(scene);
+    try std.testing.expect(!assimp.sceneHasSkeletons(scene));
+
+    const root = assimp.sceneRootNode(scene) orelse return error.SkipZigTest;
+    try std.testing.expect(assimp.nodeMetaData(root) == null);
+}
+
+test "getMaterialProperty" {
+    var importer = assimp.Importer.init(std.testing.allocator);
+    defer importer.deinit();
+    const scene = try importer.importFileFromMemory(box_mat_obj, "obj", .{ .triangulate = true });
+    const mats = assimp.sceneMaterials(scene);
+    if (mats.len > 0) {
+        const mat = mats[0] orelse return error.SkipZigTest;
+        var prop: ?*const assimp.aiMaterialProperty = undefined;
+        const result = assimp.getMaterialProperty(mat, assimp.AI_MATKEY_NAME, 0, 0, &prop);
+        _ = result;
+    }
+}
+
+test "meshFindBoneByName returns null on box.obj" {
+    var importer = assimp.Importer.init(std.testing.allocator);
+    defer importer.deinit();
+    const scene = try importer.importFileFromMemory(box_obj, "obj", .{ .triangulate = true });
+    const mesh = assimp.sceneMeshes(scene)[0] orelse return error.SkipZigTest;
+    const bone = assimp.meshFindBoneByName(mesh, "nonexistent");
+    try std.testing.expect(bone == null);
+}
+
+test "sceneFindEmbeddedTexture returns null on box.obj" {
+    var importer = assimp.Importer.init(std.testing.allocator);
+    defer importer.deinit();
+    const scene = try importer.importFileFromMemory(box_obj, "obj", .{ .triangulate = true });
+    const tex = assimp.sceneFindEmbeddedTexture(scene, "nonexistent");
+    try std.testing.expect(tex == null);
+}
+
+test "export to blob" {
+    var importer = assimp.Importer.init(std.testing.allocator);
+    defer importer.deinit();
+    const scene = try importer.importFileFromMemory(box_obj, "obj", .{ .triangulate = true });
+    const blob = assimp.Exporter.exportSceneToBlob(scene, "assbin", @as(assimp.aiPostProcessSteps, .{}));
+    if (blob) |b| {
+        try std.testing.expect(b.size > 0);
+        assimp.Exporter.releaseExportBlob(b);
+    }
+}
