@@ -260,6 +260,18 @@ pub const Importer = struct {
         return self.scene;
     }
 
+    /// Exports the currently imported scene to a file.
+    pub fn exportScene(self: *const Importer, format_id: [:0]const u8, file_name: [:0]const u8, preprocessing: types.aiPostProcessSteps) types.aiReturn {
+        const scene = self.scene orelse return .FAILURE;
+        return c.aiExportScene(scene, format_id.ptr, file_name.ptr, @bitCast(preprocessing));
+    }
+
+    /// Exports the currently imported scene to an in-memory blob.
+    pub fn exportSceneToBlob(self: *const Importer, format_id: [:0]const u8, preprocessing: types.aiPostProcessSteps) ?*const types.aiExportDataBlob {
+        const scene = self.scene orelse return null;
+        return c.aiExportSceneToBlob(scene, format_id.ptr, @bitCast(preprocessing));
+    }
+
     pub fn getOrCreatePropertyStore(self: *Importer) ?*types.aiPropertyStore {
         if (self.property_store) |store| return store;
         self.property_store = c.aiCreatePropertyStore();
@@ -751,6 +763,15 @@ pub fn boneWeights(bone: *const types.aiBone) ?[]const types.aiVertexWeight {
 /// Returns the bone's offset (inverse bind pose) matrix.
 pub fn boneOffsetMatrix(bone: *const types.aiBone) *const types.aiMatrix4x4 {
     return &bone.mOffsetMatrix;
+}
+
+/// Finds a bone in a mesh by name. Returns null if not found.
+pub fn meshFindBoneByName(mesh: *const types.aiMesh, name: []const u8) ?*const types.aiBone {
+    for (meshBones(mesh)) |bone_opt| {
+        const bone = bone_opt orelse continue;
+        if (std.mem.eql(u8, bone.mName.toSlice(), name)) return bone;
+    }
+    return null;
 }
 
 /// Returns the name of an animation.
