@@ -703,12 +703,30 @@ pub fn nodeAnimScalingKeys(na: *const types.aiNodeAnim) ?[]const types.aiVectorK
 }
 
 /// Searches the node hierarchy depth-first for a node with the given name.
-/// Returns null if not found. Uses recursive traversal.
-pub fn nodeFindByName(node: *const types.aiNode, name: []const u8) ?*const types.aiNode {
-    if (std.mem.eql(u8, node.mName.toSlice(), name)) return node;
-    for (nodeChildren(node)) |child| {
+/// Returns null if not found. Uses iterative traversal to avoid stack overflow.
+pub fn nodeFindByName(root: *const types.aiNode, name: []const u8) ?*const types.aiNode {
+    if (std.mem.eql(u8, root.mName.toSlice(), name)) return root;
+    var stack: [256]?*const types.aiNode = .{null} ** 256;
+    var sp: usize = 0;
+    for (nodeChildren(root)) |child| {
         if (child) |ch| {
-            if (nodeFindByName(ch, name)) |found| return found;
+            if (sp < stack.len) {
+                stack[sp] = ch;
+                sp += 1;
+            }
+        }
+    }
+    while (sp > 0) {
+        sp -= 1;
+        const node = stack[sp] orelse continue;
+        if (std.mem.eql(u8, node.mName.toSlice(), name)) return node;
+        for (nodeChildren(node)) |child| {
+            if (child) |ch| {
+                if (sp < stack.len) {
+                    stack[sp] = ch;
+                    sp += 1;
+                }
+            }
         }
     }
     return null;
@@ -802,6 +820,24 @@ pub fn nodeAnimPreState(na: *const types.aiNodeAnim) types.aiAnimBehaviour {
 /// Returns the post-state behaviour of a node animation channel.
 pub fn nodeAnimPostState(na: *const types.aiNodeAnim) types.aiAnimBehaviour {
     return na.mPostState;
+}
+
+/// Finds an embedded texture in the scene by filename or index reference.
+/// Supports both filename lookup and `"*N"` index references (e.g. `"*0"`, `"*1"`).
+pub fn sceneFindEmbeddedTexture(scene: *const types.aiScene, name: []const u8) ?*const types.aiTexture {
+    if (name.len > 1 and name[0] == '*') {
+        const index = std.fmt.parseInt(c_uint, name[1..], 10) catch return null;
+        if (index < scene.mNumTextures) {
+            const textures = sceneTextures(scene);
+            return if (index < textures.len) textures[index] else null;
+        }
+        return null;
+    }
+    for (sceneTextures(scene)) |tex_opt| {
+        const tex = tex_opt orelse continue;
+        if (std.mem.eql(u8, tex.mFilename.toSlice(), name)) return tex;
+    }
+    return null;
 }
 
 /// Returns embedded texture data as bytes.

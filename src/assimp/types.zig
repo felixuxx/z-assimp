@@ -400,6 +400,16 @@ pub const aiString = extern struct {
     pub fn toSlice(self: *const aiString) []const u8 {
         return self.data[0..self.length];
     }
+
+    /// Creates an `aiString` from a byte slice. The slice must be 1023 bytes or fewer.
+    pub fn fromSlice(slice: []const u8) aiString {
+        var s: aiString = undefined;
+        const len = @min(slice.len, 1023);
+        s.length = @as(ai_uint32, @intCast(len));
+        @memcpy(s.data[0..len], slice[0..len]);
+        s.data[len] = 0;
+        return s;
+    }
 };
 
 pub const aiMemoryInfo = extern struct {
