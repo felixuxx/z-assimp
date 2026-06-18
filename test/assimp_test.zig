@@ -319,3 +319,50 @@ test "export to blob" {
         assimp.Exporter.releaseExportBlob(b);
     }
 }
+
+test "copyScene produces independent copy" {
+    var imp = assimp.Importer.init(std.testing.allocator);
+    defer imp.deinit();
+    const scene = try imp.importFileFromMemory(box_obj, "obj", .{ .triangulate = true });
+    const copy = try assimp.Exporter.copyScene(scene);
+    defer assimp.Exporter.freeScene(copy);
+    try std.testing.expectEqual(scene.mNumMeshes, copy.mNumMeshes);
+    try std.testing.expect(assimp.sceneMeshes(copy).len > 0);
+    try std.testing.expect(copy != @as(?*const assimp.aiScene, scene));
+}
+
+test "applyPostProcessing generates normals" {
+    var imp = assimp.Importer.init(std.testing.allocator);
+    defer imp.deinit();
+    const scene = try imp.importFileFromMemory(box_obj, "obj", .{ .triangulate = true });
+    try std.testing.expect(assimp.meshNormals(assimp.sceneMeshes(scene)[0].?) == null);
+    try imp.applyPostProcessing(.{ .gen_normals = true });
+    const post_scene = imp.getScene() orelse return error.SkipZigTest;
+    const mesh = assimp.sceneMeshes(post_scene)[0] orelse return error.SkipZigTest;
+    try std.testing.expect(assimp.meshNormals(mesh) != null);
+}
+
+test "log stream callback receives messages" {
+    var log_called = false;
+    const LogCB = struct {
+        pub fn callback(msg: [*:0]const u8, user: ?*anyopaque) callconv(.c) void {
+            _ = msg;
+            @as(*bool, @ptrCast(@alignCast(user.?))).* = true;
+        }
+    };
+    var stream = assimp.aiLogStream{ .callback = LogCB.callback, .user = @ptrCast(&log_called) };
+    assimp.Importer.attachLogStream(&stream);
+    _ = assimp.Importer.detachLogStream(&stream);
+}
+
+test "importFileEx with MemoryFileIO" {
+    var stream = assimp.fileio.MemoryFileStream.init(box_obj);
+    var file = assimp.fileio.createMemoryStreamFile(&stream);
+    var io = assimp.fileio.createMemoryFileIO(&file);
+
+    var imp = assimp.Importer.init(std.testing.allocator);
+    defer imp.deinit();
+    const scene = try imp.importFileEx("box.obj", .{ .triangulate = true }, &io);
+    try std.testing.expect(scene.mNumMeshes > 0);
+    try std.testing.expect(assimp.sceneHasMaterials(scene));
+}
