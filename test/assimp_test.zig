@@ -366,3 +366,4 @@ test "importFileEx with MemoryFileIO" {
     try std.testing.expect(scene.mNumMeshes > 0);
     try std.testing.expect(assimp.sceneHasMaterials(scene));
 }
+
