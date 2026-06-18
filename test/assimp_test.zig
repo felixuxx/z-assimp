@@ -95,11 +95,12 @@ test "node traversal" {
     try std.testing.expect(found != null);
 }
 
-test "string to slice" {
+test "string method-call syntax" {
     var importer = assimp.Importer.init(std.testing.allocator);
     defer importer.deinit();
     const scene = try importer.importFileFromMemory(box_obj, "obj", .{ .triangulate = true });
-    _ = assimp.toSlice(&scene.mName);
+    const slice = scene.mName.toSlice();
+    try std.testing.expect(slice.len == 0);
 }
 
 test "math wrappers" {
@@ -140,4 +141,56 @@ test "animation accessors" {
     const scene = try importer.importFileFromMemory(box_obj, "obj", .{ .triangulate = true });
     const anims = assimp.sceneAnimations(scene);
     try std.testing.expect(anims.len == 0);
+}
+
+test "math re-exports are accessible" {
+    const a = assimp.types.aiVector3D{ .x = 1, .y = 0, .z = 0 };
+    const b = assimp.types.aiVector3D{ .x = 0, .y = 1, .z = 0 };
+    const r = assimp.vec3Add(a, b);
+    try std.testing.expectApproxEqAbs(@as(f32, 1), r.x, 0.001);
+    try std.testing.expectApproxEqAbs(@as(f32, 1), r.y, 0.001);
+    _ = assimp.vec3Cross(a, b);
+    _ = assimp.vec3Dot(a, b);
+    _ = assimp.vec3Length(a);
+    _ = assimp.vec3Normalize(a);
+    _ = assimp.vec3TransformByMatrix4(a, assimp.mat4Identity());
+    _ = assimp.vec2Length(assimp.types.aiVector2D{ .x = 1, .y = 0 });
+    _ = assimp.mat4Mul(assimp.mat4Identity(), assimp.mat4Identity());
+    _ = assimp.mat4Inverse(assimp.mat4Identity());
+    _ = assimp.quatMul(assimp.types.aiQuaternion{ .w = 1, .x = 0, .y = 0, .z = 0 }, assimp.types.aiQuaternion{ .w = 1, .x = 0, .y = 0, .z = 0 });
+}
+
+test "animation name helpers" {
+    var importer = assimp.Importer.init(std.testing.allocator);
+    defer importer.deinit();
+    const scene = try importer.importFileFromMemory(box_obj, "obj", .{ .triangulate = true });
+    for (assimp.sceneAnimations(scene)) |anim_opt| {
+        const anim = anim_opt orelse continue;
+        _ = assimp.animName(anim);
+        _ = assimp.animDuration(anim);
+        _ = assimp.animTicksPerSecond(anim);
+        for (assimp.animationChannels(anim)) |chan_opt| {
+            const ch = chan_opt orelse continue;
+            _ = assimp.nodeAnimChannelName(ch);
+        }
+    }
+}
+
+test "memory FileIO construction" {
+    var stream = assimp.fileio.MemoryFileStream.init("hello world");
+    var file = assimp.fileio.createMemoryStreamFile(&stream);
+    const io = assimp.fileio.createMemoryFileIO(&file);
+
+    const read_proc = io.OpenProc;
+    const close_proc = io.CloseProc;
+    _ = read_proc;
+    _ = close_proc;
+
+    var buffer: [5]u8 = undefined;
+    const bytes_read = file.ReadProc(&file, &buffer, 1, 5);
+    try std.testing.expectEqual(@as(usize, 5), bytes_read);
+    try std.testing.expectEqual(@as(u8, 'h'), buffer[0]);
+
+    const pos = file.TellProc(&file);
+    try std.testing.expectEqual(@as(usize, 5), pos);
 }

@@ -385,6 +385,10 @@ pub const aiUVTransform = extern struct {
 pub const aiString = extern struct {
     length: ai_uint32,
     data: [1024]u8,
+
+    pub fn toSlice(self: *const aiString) []const u8 {
+        return self.data[0..self.length];
+    }
 };
 
 pub const aiMemoryInfo = extern struct {
@@ -436,6 +440,11 @@ pub const aiImporterDesc = extern struct {
 pub const aiFace = extern struct {
     mNumIndices: c_uint,
     mIndices: ?[*]c_uint,
+
+    pub fn toSlice(self: *const aiFace) []const c_uint {
+        if (self.mIndices) |ptr| return ptr[0..self.mNumIndices];
+        return &[_]c_uint{};
+    }
 };
 
 pub const aiVertexWeight = extern struct {

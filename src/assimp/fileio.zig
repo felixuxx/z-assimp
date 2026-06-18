@@ -43,7 +43,7 @@ pub const MemoryFileStream = struct {
 };
 
 fn memFileRead(file: *types.aiFile, buffer: ?[*]u8, size: usize, count: usize) callconv(.c) usize {
-    const stream = @as(*MemoryFileStream, @ptrCast(@alignCast(file.UserData orelse return 0)));
+    const stream: *MemoryFileStream = @ptrCast(@alignCast(file.UserData orelse return 0));
     const bytes_to_read = @min(size * count, stream.data.len - stream.position);
     if (buffer) |buf| {
         @memcpy(buf[0..bytes_to_read], stream.data[stream.position..][0..bytes_to_read]);
@@ -52,23 +52,22 @@ fn memFileRead(file: *types.aiFile, buffer: ?[*]u8, size: usize, count: usize) c
     return if (size > 0) bytes_to_read / size else 0;
 }
 
-fn memFileWrite(file: *types.aiFile, _: ?[*]const u8, _: usize, _: usize) callconv(.c) usize {
-    _ = file;
+fn memFileWrite(_: *types.aiFile, _: ?[*]const u8, _: usize, _: usize) callconv(.c) usize {
     return 0;
 }
 
 fn memFileTell(file: *types.aiFile) callconv(.c) usize {
-    const stream = @as(*MemoryFileStream, @ptrCast(@alignCast(file.UserData orelse return 0)));
+    const stream: *MemoryFileStream = @ptrCast(@alignCast(file.UserData orelse return 0));
     return stream.position;
 }
 
 fn memFileSize(file: *types.aiFile) callconv(.c) usize {
-    const stream = @as(*MemoryFileStream, @ptrCast(@alignCast(file.UserData orelse return 0)));
+    const stream: *MemoryFileStream = @ptrCast(@alignCast(file.UserData orelse return 0));
     return stream.data.len;
 }
 
 fn memFileSeek(file: *types.aiFile, offset: usize, origin: types.aiOrigin) callconv(.c) types.aiReturn {
-    const stream = @as(*MemoryFileStream, @ptrCast(@alignCast(file.UserData orelse return .FAILURE)));
+    const stream: *MemoryFileStream = @ptrCast(@alignCast(file.UserData orelse return .FAILURE));
     stream.position = switch (origin) {
         .SET => offset,
         .CUR => stream.position + offset,
@@ -89,16 +88,16 @@ pub fn createMemoryStreamFile(stream: *MemoryFileStream) types.aiFile {
         memFileSize,
         memFileSeek,
         memFileFlush,
-        @ptrCast(stream),
+        @as(types.aiUserData, @ptrCast(stream)),
     );
 }
 
 fn memSingleOpen(io: *types.aiFileIO, _: [*:0]const u8, _: [*:0]const u8) callconv(.c) ?*types.aiFile {
-    return if (io.UserData) |ud| @ptrCast(ud) else null;
+    return if (io.UserData) |ud| @as(?*types.aiFile, @ptrCast(@alignCast(ud))) else null;
 }
 
 fn memSingleClose(_: *types.aiFileIO, _: *types.aiFile) callconv(.c) void {}
 
 pub fn createMemoryFileIO(file: *types.aiFile) types.aiFileIO {
-    return createFileIO(memSingleOpen, memSingleClose, @ptrCast(file));
+    return createFileIO(memSingleOpen, memSingleClose, @ptrCast(@alignCast(file)));
 }

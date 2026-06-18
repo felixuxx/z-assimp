@@ -615,7 +615,7 @@ pub fn nodeAnimScalingKeys(na: *const types.aiNodeAnim) ?[]const types.aiVectorK
 }
 
 pub fn nodeFindByName(node: *const types.aiNode, name: []const u8) ?*const types.aiNode {
-    if (std.mem.eql(u8, toSlice(&node.mName), name)) return node;
+    if (std.mem.eql(u8, node.mName.toSlice(), name)) return node;
     for (nodeChildren(node)) |child| {
         if (child) |ch| {
             if (nodeFindByName(ch, name)) |found| return found;
@@ -624,17 +624,12 @@ pub fn nodeFindByName(node: *const types.aiNode, name: []const u8) ?*const types
     return null;
 }
 
-pub fn toSlice(s: *const types.aiString) []const u8 {
-    return s.data[0..s.length];
-}
-
 pub fn faceIndices(face: *const types.aiFace) []const c_uint {
-    if (face.mIndices) |ptr| return ptr[0..face.mNumIndices];
-    return &[_]c_uint{};
+    return face.toSlice();
 }
 
 pub fn boneName(bone: *const types.aiBone) []const u8 {
-    return toSlice(&bone.mName);
+    return bone.mName.toSlice();
 }
 
 pub fn boneWeights(bone: *const types.aiBone) ?[]const types.aiVertexWeight {
@@ -647,7 +642,7 @@ pub fn boneOffsetMatrix(bone: *const types.aiBone) *const types.aiMatrix4x4 {
 }
 
 pub fn animName(anim: *const types.aiAnimation) []const u8 {
-    return toSlice(&anim.mName);
+    return anim.mName.toSlice();
 }
 
 pub fn animDuration(anim: *const types.aiAnimation) f64 {
@@ -659,7 +654,7 @@ pub fn animTicksPerSecond(anim: *const types.aiAnimation) f64 {
 }
 
 pub fn nodeAnimChannelName(na: *const types.aiNodeAnim) []const u8 {
-    return toSlice(&na.mNodeName);
+    return na.mNodeName.toSlice();
 }
 
 pub fn skeletonBones(skel: *const types.aiSkeleton) []const ?*types.aiSkeletonBone {
@@ -668,7 +663,7 @@ pub fn skeletonBones(skel: *const types.aiSkeleton) []const ?*types.aiSkeletonBo
 }
 
 pub fn skeletonName(skel: *const types.aiSkeleton) []const u8 {
-    return toSlice(&skel.mName);
+    return skel.mName.toSlice();
 }
 
 pub fn meshAnimKeys(ma: *const types.aiMeshAnim) ?[]const types.aiMeshKey {

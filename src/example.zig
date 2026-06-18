@@ -12,7 +12,7 @@ pub fn main() !void {
         .gen_normals = true,
     });
 
-    std.debug.print("Scene: {s}\n", .{assimp.toSlice(&scene.mName)});
+    std.debug.print("Scene: {s}\n", .{scene.mName.toSlice()});
     std.debug.print("  Meshes:    {}\n", .{scene.mNumMeshes});
     std.debug.print("  Materials: {}\n", .{scene.mNumMaterials});
     std.debug.print("  Animations:{}\n", .{scene.mNumAnimations});
@@ -20,7 +20,7 @@ pub fn main() !void {
 
     for (assimp.sceneMeshes(scene), 0..) |mesh_opt, i| {
         const mesh = mesh_opt orelse continue;
-        std.debug.print("\nMesh {}: {s}\n", .{ i, assimp.toSlice(&mesh.mName) });
+        std.debug.print("\nMesh {}: {s}\n", .{ i, mesh.mName.toSlice() });
         std.debug.print("  Vertices: {}\n", .{mesh.mNumVertices});
         std.debug.print("  Faces:    {}\n", .{mesh.mNumFaces});
         std.debug.print("  Bones:    {}\n", .{mesh.mNumBones});
@@ -43,7 +43,7 @@ pub fn main() !void {
     }
 
     const root = scene.mRootNode orelse return;
-    std.debug.print("\nRoot node: {s}\n", .{assimp.toSlice(&root.mName)});
+    std.debug.print("\nRoot node: {s}\n", .{root.mName.toSlice()});
     std.debug.print("  Children: {}\n", .{root.mNumChildren});
     if (assimp.nodeFindByName(root, "1")) |node| {
         std.debug.print("  Found node '1' with {} meshes\n", .{node.mNumMeshes});
