@@ -4,15 +4,9 @@ This repo wraps [Assimp](https://github.com/assimp/assimp) v5.3.1 with a [Zig](h
 
 ## Quick Start
 
-Add as a dependency in `build.zig.zon`:
-
-```zon
-.dependencies = .{
-    .zig_assimp = .{
-        .url = "https://github.com/YOUR_USER/zig_assimp/archive/refs/heads/master.tar.gz",
-        .hash = "...",
-    },
-},
+Add as a dependency in a project:
+```zig
+zig fetch --save git+https://github.com/felixuxx/z-assimp.git
 ```
 
 In `build.zig`:
