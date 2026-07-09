@@ -1,6 +1,6 @@
 # OpenAssetImporter Library Binding for Zig
 
-This repo wraps [Assimp](https://github.com/assimp/assimp) v5.3.1 with a [Zig](https://ziglang.org/) build system and provides Zig bindings for the full C API.
+This repo wraps [Assimp](https://github.com/assimp/assimp) v5.3.1 with a [Zig](https://ziglang.org/) build system and provides Zig and odin bindings bindings for the full C API.
 
 ## Quick Start
 
