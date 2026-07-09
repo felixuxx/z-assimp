@@ -53,7 +53,7 @@ pub const AI_SCENE_FLAGS_TERRAIN: c_uint = 0x10;
 pub const AI_SCENE_FLAGS_ALLOW_SHARED: c_uint = 0x20;
 
 pub const AI_DEFAULT_MATERIAL_NAME = "DefaultMaterial";
-pub const AI_TEXTURE_TYPE_MAX: c_int = 21;
+pub const AI_TEXTURE_TYPE_MAX: c_int = 27;
 pub const AI_EMBEDDED_TEXNAME_PREFIX = "*";
 
 pub const ASSIMP_CFLAGS_SHARED: c_uint = 0x1;
@@ -125,6 +125,12 @@ pub const aiTextureType = enum(c_int) {
     SHEEN = 19,
     CLEARCOAT = 20,
     TRANSMISSION = 21,
+    MAYA_BASE = 22,
+    MAYA_SPECULAR = 23,
+    MAYA_SPECULAR_COLOR = 24,
+    MAYA_SPECULAR_ROUGHNESS = 25,
+    ANISOTROPY = 26,
+    GLTF_METALLIC_ROUGHNESS = 27,
     _,
 };
 
@@ -190,6 +196,14 @@ pub const aiPropertyTypeInfo = enum(c_int) {
     String = 0x3,
     Integer = 0x4,
     Buffer = 0x5,
+    _,
+};
+
+pub const aiAnimInterpolation = enum(c_int) {
+    Step = 0x0,
+    Linear = 0x1,
+    SphericalLinear = 0x2,
+    CubicSpline = 0x3,
     _,
 };
 
@@ -578,11 +592,13 @@ pub const aiMaterial = extern struct {
 pub const aiVectorKey = extern struct {
     mTime: f64,
     mValue: aiVector3D,
+    mInterpolation: aiAnimInterpolation,
 };
 
 pub const aiQuatKey = extern struct {
     mTime: f64,
     mValue: aiQuaternion,
+    mInterpolation: aiAnimInterpolation,
 };
 
 pub const aiMeshKey = extern struct {
@@ -755,8 +771,11 @@ pub const AI_CONFIG_PP_RRM_EXCLUDE_LIST = "PP_RRM_EXCLUDE_LIST";
 pub const AI_CONFIG_PP_FID_ANIM_ACCURACY = "PP_FID_ANIM_ACCURACY";
 pub const AI_CONFIG_GLOBAL_SCALE_FACTOR_KEY = "GLOBAL_SCALE_FACTOR";
 pub const AI_CONFIG_GLOBAL_SCALE_FACTOR_DEFAULT = "GLOBAL_SCALE_FACTOR_DEFAULT";
+pub const AI_CONFIG_CHECK_IDENTITY_MATRIX_EPSILON = "CHECK_IDENTITY_MATRIX_EPSILON";
 pub const AI_CONFIG_EXPORT_BLOB_NAME = "EXPORT_BLOB_NAME";
 pub const AI_CONFIG_IMPORT_SEARCH_PATH = "IMPORT_SEARCH_PATH";
+pub const AI_CONFIG_EXPORT_GLTF_UNLIMITED_SKINNING_BONES_PER_VERTEX = "EXPORT_GLTF_UNLIMITED_SKINNING_BONES_PER_VERTEX";
+pub const AI_CONFIG_EXPORT_FBX_TRANSPARENCY_FACTOR_REFER_TO_OPACITY = "EXPORT_FBX_TRANSPARENCY_FACTOR_REFER_TO_OPACITY";
 pub const AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS = "IMPORT_FBX_PRESERVE_PIVOTS";
 pub const AI_CONFIG_IMPORT_FBX_READ_ALL_GEOMETRY_LAYERS = "IMPORT_FBX_READ_ALL_GEOMETRY_LAYERS";
 pub const AI_CONFIG_IMPORT_FBX_READ_MATERIALS = "IMPORT_FBX_READ_MATERIALS";
@@ -918,3 +937,4 @@ pub const AI_MATKEY_MAPPINGMODE_V_BASE = "$tex.mapmodev";
 pub const AI_MATKEY_TEXMAP_AXIS_BASE = "$tex.mapaxis";
 pub const AI_MATKEY_UVTRANSFORM_BASE = "$tex.uvtrafo";
 pub const AI_MATKEY_TEXFLAGS_BASE = "$tex.flags";
+pub const AI_MATKEY_ANISOTROPY_ROTATION = "$mat.anisotropyRotation";

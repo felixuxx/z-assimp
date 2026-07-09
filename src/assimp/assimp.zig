@@ -68,6 +68,7 @@ pub const aiShadingMode = types.aiShadingMode;
 pub const aiTextureFlags = types.aiTextureFlags;
 pub const aiBlendMode = types.aiBlendMode;
 pub const aiPropertyTypeInfo = types.aiPropertyTypeInfo;
+pub const aiAnimInterpolation = types.aiAnimInterpolation;
 pub const aiAnimBehaviour = types.aiAnimBehaviour;
 pub const aiLightSourceType = types.aiLightSourceType;
 pub const aiMetadataType = types.aiMetadataType;

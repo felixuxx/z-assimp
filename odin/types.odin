@@ -48,7 +48,7 @@ AI_SCENE_FLAGS_TERRAIN                 :: 0x10
 AI_SCENE_FLAGS_ALLOW_SHARED            :: 0x20
 
 AI_DEFAULT_MATERIAL_NAME :: "DefaultMaterial"
-AI_TEXTURE_TYPE_MAX :: 21
+AI_TEXTURE_TYPE_MAX :: 27
 AI_EMBEDDED_TEXNAME_PREFIX :: "*"
 
 ASSIMP_CFLAGS_SHARED           :: 0x1
@@ -117,6 +117,12 @@ aiTextureType :: enum i32 {
     SHEEN = 19,
     CLEARCOAT = 20,
     TRANSMISSION = 21,
+    MAYA_BASE = 22,
+    MAYA_SPECULAR = 23,
+    MAYA_SPECULAR_COLOR = 24,
+    MAYA_SPECULAR_ROUGHNESS = 25,
+    ANISOTROPY = 26,
+    GLTF_METALLIC_ROUGHNESS = 27,
 }
 
 aiTextureOp :: enum i32 {
@@ -175,6 +181,13 @@ aiPropertyTypeInfo :: enum i32 {
     String = 0x3,
     Integer = 0x4,
     Buffer = 0x5,
+}
+
+aiAnimInterpolation :: enum i32 {
+    Step = 0x0,
+    Linear = 0x1,
+    SphericalLinear = 0x2,
+    CubicSpline = 0x3,
 }
 
 aiAnimBehaviour :: enum i32 {
@@ -513,11 +526,13 @@ aiMaterial :: struct {
 aiVectorKey :: struct {
     time: f64,
     value: aiVector3D,
+    interpolation: aiAnimInterpolation,
 }
 
 aiQuatKey :: struct {
     time: f64,
     value: aiQuaternion,
+    interpolation: aiAnimInterpolation,
 }
 
 aiMeshKey :: struct {
@@ -727,8 +742,12 @@ AI_MATKEY_TEXBLEND_BASE                  :: "$tex.blend"
 AI_MATKEY_MAPPINGMODE_U_BASE             :: "$tex.mapmodeu"
 AI_MATKEY_MAPPINGMODE_V_BASE             :: "$tex.mapmodev"
 AI_MATKEY_TEXMAP_AXIS_BASE               :: "$tex.mapaxis"
-AI_MATKEY_UVTRANSFORM_BASE               :: "$tex.uvtrafo"
-AI_MATKEY_TEXFLAGS_BASE                  :: "$tex.flags"
+AI_MATKEY_UVTRANSFORM_BASE                :: "$tex.uvtrafo"
+AI_MATKEY_TEXFLAGS_BASE                   :: "$tex.flags"
+AI_MATKEY_ANISOTROPY_ROTATION             :: "$mat.anisotropyRotation"
+AI_MATKEY_VOLUME_THICKNESS_FACTOR         :: "$mat.volume.thicknessFactor"
+AI_MATKEY_VOLUME_ATTENUATION_DISTANCE     :: "$mat.volume.attenuationDistance"
+AI_MATKEY_VOLUME_ATTENUATION_COLOR        :: "$mat.volume.attenuationColor"
 
 // --- AI_CONFIG_* constants ---
 
@@ -751,8 +770,11 @@ AI_CONFIG_PP_RRM_EXCLUDE_LIST             :: "PP_RRM_EXCLUDE_LIST"
 AI_CONFIG_PP_FID_ANIM_ACCURACY            :: "PP_FID_ANIM_ACCURACY"
 AI_CONFIG_GLOBAL_SCALE_FACTOR_KEY         :: "GLOBAL_SCALE_FACTOR"
 AI_CONFIG_GLOBAL_SCALE_FACTOR_DEFAULT      :: "GLOBAL_SCALE_FACTOR_DEFAULT"
+AI_CONFIG_CHECK_IDENTITY_MATRIX_EPSILON   :: "CHECK_IDENTITY_MATRIX_EPSILON"
 AI_CONFIG_EXPORT_BLOB_NAME                :: "EXPORT_BLOB_NAME"
 AI_CONFIG_IMPORT_SEARCH_PATH              :: "IMPORT_SEARCH_PATH"
+AI_CONFIG_EXPORT_GLTF_UNLIMITED_SKINNING_BONES_PER_VERTEX :: "EXPORT_GLTF_UNLIMITED_SKINNING_BONES_PER_VERTEX"
+AI_CONFIG_EXPORT_FBX_TRANSPARENCY_FACTOR_REFER_TO_OPACITY :: "EXPORT_FBX_TRANSPARENCY_FACTOR_REFER_TO_OPACITY"
 AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS       :: "IMPORT_FBX_PRESERVE_PIVOTS"
 AI_CONFIG_IMPORT_FBX_READ_ALL_GEOMETRY_LAYERS :: "IMPORT_FBX_READ_ALL_GEOMETRY_LAYERS"
 AI_CONFIG_IMPORT_FBX_READ_MATERIALS        :: "IMPORT_FBX_READ_MATERIALS"

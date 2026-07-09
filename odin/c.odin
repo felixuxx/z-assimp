@@ -163,5 +163,6 @@ foreign assimp {
 
     // --- Importer info ---
 
+    aiGetEmbeddedTexture :: proc(scene: ^aiScene, filename: cstring) -> ^aiTexture ---
     aiGetImporterDesc :: proc(extension: cstring) -> ^aiImporterDesc ---
 }

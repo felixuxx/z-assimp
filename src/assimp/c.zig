@@ -173,6 +173,7 @@ pub extern "c" fn aiGetMaterialTextureCount(pMat: *const aiMaterial, type_: aiTe
 pub extern "c" fn aiGetMaterialTexture(pMat: *const aiMaterial, type_: aiTextureType, index: c_uint, path: *aiString, mapping: ?*types.aiTextureMapping, uvindex: ?*c_uint, blend: ?*aiReal, op: ?*types.aiTextureOp, mapmode: ?[*]types.aiTextureMapMode, flags: ?*c_uint) aiReturn;
 pub extern "c" fn aiTextureTypeToString(in_: aiTextureType) [*:0]const u8;
 
+pub extern "c" fn aiGetEmbeddedTexture(pScene: *const aiScene, filename: [*:0]const u8) ?*const aiTexture;
 pub extern "c" fn aiGetImporterDesc(extension: [*:0]const u8) ?*const aiImporterDesc;
 
 const aiTextureType = types.aiTextureType;
