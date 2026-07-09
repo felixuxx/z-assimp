@@ -45,6 +45,25 @@ pub fn build(b: *std.Build) !void {
         .{ .ASSIMP_DOUBLE_PRECISION = use_double_precision },
     );
     lib.root_module.addConfigHeader(config_h);
+
+    const revision_h = b.addConfigHeader(
+        .{
+            .style = .{ .cmake = assimp.path("include/assimp/revision.h.in") },
+            .include_path = "assimp/revision.h",
+        },
+        .{
+            .GIT_COMMIT_HASH = "0",
+            .GIT_BRANCH = "master",
+            .ASSIMP_VERSION_MAJOR = 6,
+            .ASSIMP_VERSION_MINOR = 0,
+            .ASSIMP_VERSION_PATCH = 5,
+            .ASSIMP_PACKAGE_VERSION = 0,
+            .CMAKE_SHARED_LIBRARY_PREFIX = "",
+            .LIBRARY_SUFFIX = "",
+            .CMAKE_DEBUG_POSTFIX = "",
+        },
+    );
+    lib.root_module.addConfigHeader(revision_h);
     lib.root_module.addIncludePath(assimp.path("include"));
     lib.root_module.addIncludePath(lazy_from_path("include", b));
 
@@ -56,6 +75,7 @@ pub fn build(b: *std.Build) !void {
     lib.root_module.addIncludePath(assimp.path("contrib/unzip"));
     lib.root_module.addIncludePath(assimp.path("contrib/zlib"));
     lib.root_module.addIncludePath(assimp.path("contrib/openddlparser/include"));
+    lib.root_module.addIncludePath(assimp.path("contrib/utf8cpp/source"));
 
     lib.root_module.addCMacro("RAPIDJSON_HAS_STDSTRING", "1");
 
@@ -231,6 +251,7 @@ pub fn build(b: *std.Build) !void {
 
 const unsupported_formats = [_][]const u8{
     "C4D", // fails to build, MSVC only
+    "USD", // requires external tinyusdz library
 };
 
 const sources = struct {
@@ -459,7 +480,7 @@ const sources = struct {
             "code/AssetLib/FBX/FBXUtil.cpp",
         };
         pub const glTF = [_][]const u8{
-            "code/AssetLib/glTF/glTFCommon.cpp",
+            "code/AssetLib/glTFCommon/glTFCommon.cpp",
             "code/AssetLib/glTF/glTFExporter.cpp",
             "code/AssetLib/glTF/glTFImporter.cpp",
         };

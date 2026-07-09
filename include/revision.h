@@ -1,12 +1,12 @@
 #ifndef ASSIMP_REVISION_H_INC
 #define ASSIMP_REVISION_H_INC
 
-#define GitVersion 0x209167c4
+#define GitVersion 0
 #define GitBranch "master"
 
-#define VER_MAJOR 5
+#define VER_MAJOR 6
 #define VER_MINOR 0
-#define VER_PATCH 1
+#define VER_PATCH 5
 #define VER_BUILD 0
 
 #define STR_HELP(x) #x
@@ -20,7 +20,7 @@
 #define VER_FILEVERSION_STR                                                    \
   STR(VER_MAJOR)                                                               \
   "." STR(VER_MINOR) "." STR(VER_PATCH) "." STR(                               \
-      VER_BUILD) " (Commit 209167c4)"
+      VER_BUILD) " (Commit 0)"
 #endif
 
 #ifdef NDEBUG
