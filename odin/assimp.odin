@@ -364,17 +364,15 @@ node_find_by_name :: proc(root: ^aiNode, name: string) -> ^aiNode {
     if aiString_to_slice(&root.name) == name {
         return root
     }
-    stack: [256]^aiNode
-    sp: uint
+    stack := make([dynamic]^aiNode)
+    defer delete(stack)
     for child in node_children(root) {
-        if child != nil && sp < 256 {
-            stack[sp] = child
-            sp += 1
+        if child != nil {
+            append(&stack, child)
         }
     }
-    for sp > 0 {
-        sp -= 1
-        node := stack[sp]
+    for len(stack) > 0 {
+        node := pop(&stack)
         if node == nil {
             continue
         }
@@ -382,9 +380,8 @@ node_find_by_name :: proc(root: ^aiNode, name: string) -> ^aiNode {
             return node
         }
         for child in node_children(node) {
-            if child != nil && sp < 256 {
-                stack[sp] = child
-                sp += 1
+            if child != nil {
+                append(&stack, child)
             }
         }
     }

@@ -911,30 +911,21 @@ pub fn nodeAnimScalingKeys(na: *const types.aiNodeAnim) ?[]const types.aiVectorK
 }
 
 /// Searches the node hierarchy depth-first for a node with the given name.
-/// Returns null if not found. Uses iterative traversal to avoid stack overflow.
+/// Returns null if not found. Uses iterative traversal with dynamic stack.
 pub fn nodeFindByName(root: *const types.aiNode, name: []const u8) ?*const types.aiNode {
     if (std.mem.eql(u8, root.mName.toSlice(), name)) return root;
-    var stack: [256]?*const types.aiNode = .{null} ** 256;
-    var sp: usize = 0;
+
+    var stack: std.ArrayList(*const types.aiNode) = .empty;
+    defer stack.deinit(std.heap.page_allocator);
+
     for (nodeChildren(root)) |child| {
-        if (child) |ch| {
-            if (sp < stack.len) {
-                stack[sp] = ch;
-                sp += 1;
-            }
-        }
+        if (child) |ch| stack.append(std.heap.page_allocator, ch) catch {};
     }
-    while (sp > 0) {
-        sp -= 1;
-        const node = stack[sp] orelse continue;
+
+    while (stack.pop()) |node| {
         if (std.mem.eql(u8, node.mName.toSlice(), name)) return node;
         for (nodeChildren(node)) |child| {
-            if (child) |ch| {
-                if (sp < stack.len) {
-                    stack[sp] = ch;
-                    sp += 1;
-                }
-            }
+            if (child) |ch| stack.append(std.heap.page_allocator, ch) catch {};
         }
     }
     return null;

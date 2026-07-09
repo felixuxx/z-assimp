@@ -253,6 +253,7 @@ aiPostProcessSteps :: bit_field u32 {
 }
 
 aiComponent :: bit_field u32 {
+    _reserved_0: bool | 1,
     normals: bool | 1,
     tangents_and_bitangents: bool | 1,
     colors: bool | 1,

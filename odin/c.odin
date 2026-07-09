@@ -50,14 +50,14 @@ foreign assimp {
     aiVector2AreEqualEpsilon :: proc(a: ^aiVector2D, b: ^aiVector2D, epsilon: f32) -> i32 ---
     aiVector2Add :: proc(dst: ^aiVector2D, src: ^aiVector2D) ---
     aiVector2Subtract :: proc(dst: ^aiVector2D, src: ^aiVector2D) ---
-    aiVector2Scale :: proc(dst: ^aiVector2D, s: f32) ---
+    aiVector2Scale :: proc(dst: ^aiVector2D, s: ai_real) ---
     aiVector2SymMul :: proc(dst: ^aiVector2D, other: ^aiVector2D) ---
-    aiVector2DivideByScalar :: proc(dst: ^aiVector2D, s: f32) ---
+    aiVector2DivideByScalar :: proc(dst: ^aiVector2D, s: ai_real) ---
     aiVector2DivideByVector :: proc(dst: ^aiVector2D, v: ^aiVector2D) ---
-    aiVector2Length :: proc(v: ^aiVector2D) -> f32 ---
-    aiVector2SquareLength :: proc(v: ^aiVector2D) -> f32 ---
+    aiVector2Length :: proc(v: ^aiVector2D) -> ai_real ---
+    aiVector2SquareLength :: proc(v: ^aiVector2D) -> ai_real ---
     aiVector2Negate :: proc(dst: ^aiVector2D) ---
-    aiVector2DotProduct :: proc(a: ^aiVector2D, b: ^aiVector2D) -> f32 ---
+    aiVector2DotProduct :: proc(a: ^aiVector2D, b: ^aiVector2D) -> ai_real ---
     aiVector2Normalize :: proc(v: ^aiVector2D) ---
 
     // --- Vector3 ---
@@ -67,14 +67,14 @@ foreign assimp {
     aiVector3LessThan :: proc(a: ^aiVector3D, b: ^aiVector3D) -> i32 ---
     aiVector3Add :: proc(dst: ^aiVector3D, src: ^aiVector3D) ---
     aiVector3Subtract :: proc(dst: ^aiVector3D, src: ^aiVector3D) ---
-    aiVector3Scale :: proc(dst: ^aiVector3D, s: f32) ---
+    aiVector3Scale :: proc(dst: ^aiVector3D, s: ai_real) ---
     aiVector3SymMul :: proc(dst: ^aiVector3D, other: ^aiVector3D) ---
-    aiVector3DivideByScalar :: proc(dst: ^aiVector3D, s: f32) ---
+    aiVector3DivideByScalar :: proc(dst: ^aiVector3D, s: ai_real) ---
     aiVector3DivideByVector :: proc(dst: ^aiVector3D, v: ^aiVector3D) ---
-    aiVector3Length :: proc(v: ^aiVector3D) -> f32 ---
-    aiVector3SquareLength :: proc(v: ^aiVector3D) -> f32 ---
+    aiVector3Length :: proc(v: ^aiVector3D) -> ai_real ---
+    aiVector3SquareLength :: proc(v: ^aiVector3D) -> ai_real ---
     aiVector3Negate :: proc(dst: ^aiVector3D) ---
-    aiVector3DotProduct :: proc(a: ^aiVector3D, b: ^aiVector3D) -> f32 ---
+    aiVector3DotProduct :: proc(a: ^aiVector3D, b: ^aiVector3D) -> ai_real ---
     aiVector3CrossProduct :: proc(dst: ^aiVector3D, a: ^aiVector3D, b: ^aiVector3D) ---
     aiVector3Normalize :: proc(v: ^aiVector3D) ---
     aiVector3NormalizeSafe :: proc(v: ^aiVector3D) ---
@@ -87,9 +87,9 @@ foreign assimp {
     aiMatrix3AreEqual :: proc(a: ^aiMatrix3x3, b: ^aiMatrix3x3) -> i32 ---
     aiMatrix3AreEqualEpsilon :: proc(a: ^aiMatrix3x3, b: ^aiMatrix3x3, epsilon: f32) -> i32 ---
     aiMatrix3Inverse :: proc(mat: ^aiMatrix3x3) ---
-    aiMatrix3Determinant :: proc(mat: ^aiMatrix3x3) -> f32 ---
-    aiMatrix3RotationZ :: proc(mat: ^aiMatrix3x3, angle: f32) ---
-    aiMatrix3FromRotationAroundAxis :: proc(mat: ^aiMatrix3x3, axis: ^aiVector3D, angle: f32) ---
+    aiMatrix3Determinant :: proc(mat: ^aiMatrix3x3) -> ai_real ---
+    aiMatrix3RotationZ :: proc(mat: ^aiMatrix3x3, angle: ai_real) ---
+    aiMatrix3FromRotationAroundAxis :: proc(mat: ^aiMatrix3x3, axis: ^aiVector3D, angle: ai_real) ---
     aiMatrix3Translation :: proc(mat: ^aiMatrix3x3, translation: ^aiVector2D) ---
     aiMatrix3FromTo :: proc(mat: ^aiMatrix3x3, from: ^aiVector3D, to: ^aiVector3D) ---
 
@@ -101,31 +101,31 @@ foreign assimp {
     aiMatrix4AreEqual :: proc(a: ^aiMatrix4x4, b: ^aiMatrix4x4) -> i32 ---
     aiMatrix4AreEqualEpsilon :: proc(a: ^aiMatrix4x4, b: ^aiMatrix4x4, epsilon: f32) -> i32 ---
     aiMatrix4Inverse :: proc(mat: ^aiMatrix4x4) ---
-    aiMatrix4Determinant :: proc(mat: ^aiMatrix4x4) -> f32 ---
+    aiMatrix4Determinant :: proc(mat: ^aiMatrix4x4) -> ai_real ---
     aiMatrix4IsIdentity :: proc(mat: ^aiMatrix4x4) -> i32 ---
     aiMatrix4DecomposeIntoScalingEulerAnglesPosition :: proc(mat: ^aiMatrix4x4, scaling: ^aiVector3D, rotation: ^aiVector3D, position: ^aiVector3D) ---
     aiMatrix4DecomposeIntoScalingAxisAnglePosition :: proc(mat: ^aiMatrix4x4, scaling: ^aiVector3D, axis: ^aiVector3D, angle: ^ai_real, position: ^aiVector3D) ---
     aiMatrix4DecomposeNoScaling :: proc(mat: ^aiMatrix4x4, rotation: ^aiQuaternion, position: ^aiVector3D) ---
-    aiMatrix4FromEulerAngles :: proc(mat: ^aiMatrix4x4, x: f32, y: f32, z: f32) ---
-    aiMatrix4RotationX :: proc(mat: ^aiMatrix4x4, angle: f32) ---
-    aiMatrix4RotationY :: proc(mat: ^aiMatrix4x4, angle: f32) ---
-    aiMatrix4RotationZ :: proc(mat: ^aiMatrix4x4, angle: f32) ---
-    aiMatrix4FromRotationAroundAxis :: proc(mat: ^aiMatrix4x4, axis: ^aiVector3D, angle: f32) ---
+    aiMatrix4FromEulerAngles :: proc(mat: ^aiMatrix4x4, x: ai_real, y: ai_real, z: ai_real) ---
+    aiMatrix4RotationX :: proc(mat: ^aiMatrix4x4, angle: ai_real) ---
+    aiMatrix4RotationY :: proc(mat: ^aiMatrix4x4, angle: ai_real) ---
+    aiMatrix4RotationZ :: proc(mat: ^aiMatrix4x4, angle: ai_real) ---
+    aiMatrix4FromRotationAroundAxis :: proc(mat: ^aiMatrix4x4, axis: ^aiVector3D, angle: ai_real) ---
     aiMatrix4Translation :: proc(mat: ^aiMatrix4x4, translation: ^aiVector3D) ---
     aiMatrix4Scaling :: proc(mat: ^aiMatrix4x4, scaling: ^aiVector3D) ---
     aiMatrix4FromTo :: proc(mat: ^aiMatrix4x4, from: ^aiVector3D, to: ^aiVector3D) ---
 
     // --- Quaternion ---
 
-    aiQuaternionFromEulerAngles :: proc(q: ^aiQuaternion, x: f32, y: f32, z: f32) ---
-    aiQuaternionFromAxisAngle :: proc(q: ^aiQuaternion, axis: ^aiVector3D, angle: f32) ---
+    aiQuaternionFromEulerAngles :: proc(q: ^aiQuaternion, x: ai_real, y: ai_real, z: ai_real) ---
+    aiQuaternionFromAxisAngle :: proc(q: ^aiQuaternion, axis: ^aiVector3D, angle: ai_real) ---
     aiQuaternionFromNormalizedQuaternion :: proc(q: ^aiQuaternion, normalized: ^aiVector3D) ---
     aiQuaternionAreEqual :: proc(a: ^aiQuaternion, b: ^aiQuaternion) -> i32 ---
     aiQuaternionAreEqualEpsilon :: proc(a: ^aiQuaternion, b: ^aiQuaternion, epsilon: f32) -> i32 ---
     aiQuaternionNormalize :: proc(q: ^aiQuaternion) ---
     aiQuaternionConjugate :: proc(q: ^aiQuaternion) ---
     aiQuaternionMultiply :: proc(dst: ^aiQuaternion, q: ^aiQuaternion) ---
-    aiQuaternionInterpolate :: proc(dst: ^aiQuaternion, start: ^aiQuaternion, end: ^aiQuaternion, factor: f32) ---
+    aiQuaternionInterpolate :: proc(dst: ^aiQuaternion, start: ^aiQuaternion, end: ^aiQuaternion, factor: ai_real) ---
 
     // --- Version ---
 

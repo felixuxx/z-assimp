@@ -14,7 +14,7 @@ vec2_sub :: proc(a, b: aiVector2D) -> aiVector2D {
     return dst
 }
 
-vec2_scale :: proc(v: aiVector2D, s: f32) -> aiVector2D {
+vec2_scale :: proc(v: aiVector2D, s: ai_real) -> aiVector2D {
     dst := v
     aiVector2Scale(&dst, s)
     return dst
@@ -32,17 +32,17 @@ vec2_normalize :: proc(v: aiVector2D) -> aiVector2D {
     return dst
 }
 
-vec2_length :: proc(v: aiVector2D) -> f32 {
+vec2_length :: proc(v: aiVector2D) -> ai_real {
     vv := v
     return aiVector2Length(&vv)
 }
 
-vec2_length_squared :: proc(v: aiVector2D) -> f32 {
+vec2_length_squared :: proc(v: aiVector2D) -> ai_real {
     vv := v
     return aiVector2SquareLength(&vv)
 }
 
-vec2_dot :: proc(a, b: aiVector2D) -> f32 {
+vec2_dot :: proc(a, b: aiVector2D) -> ai_real {
     aa, bb := a, b
     return aiVector2DotProduct(&aa, &bb)
 }
@@ -63,7 +63,7 @@ vec2_sym_mul :: proc(a, b: aiVector2D) -> aiVector2D {
     return dst
 }
 
-vec2_div_scalar :: proc(v: aiVector2D, s: f32) -> aiVector2D {
+vec2_div_scalar :: proc(v: aiVector2D, s: ai_real) -> aiVector2D {
     dst := v
     aiVector2DivideByScalar(&dst, s)
     return dst
@@ -89,7 +89,7 @@ vec3_sub :: proc(a, b: aiVector3D) -> aiVector3D {
     return dst
 }
 
-vec3_scale :: proc(v: aiVector3D, s: f32) -> aiVector3D {
+vec3_scale :: proc(v: aiVector3D, s: ai_real) -> aiVector3D {
     dst := v
     aiVector3Scale(&dst, s)
     return dst
@@ -120,17 +120,17 @@ vec3_cross :: proc(a, b: aiVector3D) -> aiVector3D {
     return dst
 }
 
-vec3_dot :: proc(a, b: aiVector3D) -> f32 {
+vec3_dot :: proc(a, b: aiVector3D) -> ai_real {
     aa, bb := a, b
     return aiVector3DotProduct(&aa, &bb)
 }
 
-vec3_length :: proc(v: aiVector3D) -> f32 {
+vec3_length :: proc(v: aiVector3D) -> ai_real {
     vv := v
     return aiVector3Length(&vv)
 }
 
-vec3_length_squared :: proc(v: aiVector3D) -> f32 {
+vec3_length_squared :: proc(v: aiVector3D) -> ai_real {
     vv := v
     return aiVector3SquareLength(&vv)
 }
@@ -156,7 +156,7 @@ vec3_sym_mul :: proc(a, b: aiVector3D) -> aiVector3D {
     return dst
 }
 
-vec3_div_scalar :: proc(v: aiVector3D, s: f32) -> aiVector3D {
+vec3_div_scalar :: proc(v: aiVector3D, s: ai_real) -> aiVector3D {
     dst := v
     aiVector3DivideByScalar(&dst, s)
     return dst
@@ -206,7 +206,7 @@ mat3_inverse :: proc(m: aiMatrix3x3) -> aiMatrix3x3 {
     return dst
 }
 
-mat3_determinant :: proc(m: aiMatrix3x3) -> f32 {
+mat3_determinant :: proc(m: aiMatrix3x3) -> ai_real {
     mm := m
     return aiMatrix3Determinant(&mm)
 }
@@ -241,13 +241,13 @@ mat3_from_quaternion :: proc(q: aiQuaternion) -> aiMatrix3x3 {
     return dst
 }
 
-mat3_rotation_z :: proc(angle: f32) -> aiMatrix3x3 {
+mat3_rotation_z :: proc(angle: ai_real) -> aiMatrix3x3 {
     m: aiMatrix3x3
     aiMatrix3RotationZ(&m, angle)
     return m
 }
 
-mat3_from_rotation_around_axis :: proc(axis: aiVector3D, angle: f32) -> aiMatrix3x3 {
+mat3_from_rotation_around_axis :: proc(axis: aiVector3D, angle: ai_real) -> aiMatrix3x3 {
     m: aiMatrix3x3
     aa := axis
     aiMatrix3FromRotationAroundAxis(&m, &aa, angle)
@@ -294,7 +294,7 @@ mat4_inverse :: proc(m: aiMatrix4x4) -> aiMatrix4x4 {
     return dst
 }
 
-mat4_determinant :: proc(m: aiMatrix4x4) -> f32 {
+mat4_determinant :: proc(m: aiMatrix4x4) -> ai_real {
     mm := m
     return aiMatrix4Determinant(&mm)
 }
@@ -334,31 +334,31 @@ mat4_from_scaling_rotation_position :: proc(scaling: aiVector3D, rotation: aiQua
     return dst
 }
 
-mat4_rotation_x :: proc(angle: f32) -> aiMatrix4x4 {
+mat4_rotation_x :: proc(angle: ai_real) -> aiMatrix4x4 {
     m: aiMatrix4x4
     aiMatrix4RotationX(&m, angle)
     return m
 }
 
-mat4_rotation_y :: proc(angle: f32) -> aiMatrix4x4 {
+mat4_rotation_y :: proc(angle: ai_real) -> aiMatrix4x4 {
     m: aiMatrix4x4
     aiMatrix4RotationY(&m, angle)
     return m
 }
 
-mat4_rotation_z :: proc(angle: f32) -> aiMatrix4x4 {
+mat4_rotation_z :: proc(angle: ai_real) -> aiMatrix4x4 {
     m: aiMatrix4x4
     aiMatrix4RotationZ(&m, angle)
     return m
 }
 
-mat4_from_euler_angles :: proc(x, y, z: f32) -> aiMatrix4x4 {
+mat4_from_euler_angles :: proc(x, y, z: ai_real) -> aiMatrix4x4 {
     m: aiMatrix4x4
     aiMatrix4FromEulerAngles(&m, x, y, z)
     return m
 }
 
-mat4_from_rotation_around_axis :: proc(axis: aiVector3D, angle: f32) -> aiMatrix4x4 {
+mat4_from_rotation_around_axis :: proc(axis: aiVector3D, angle: ai_real) -> aiMatrix4x4 {
     m: aiMatrix4x4
     aa := axis
     aiMatrix4FromRotationAroundAxis(&m, &aa, angle)
@@ -446,14 +446,14 @@ quat_conjugate :: proc(q: aiQuaternion) -> aiQuaternion {
     return dst
 }
 
-quat_from_axis_angle :: proc(axis: aiVector3D, angle: f32) -> aiQuaternion {
+quat_from_axis_angle :: proc(axis: aiVector3D, angle: ai_real) -> aiQuaternion {
     q: aiQuaternion
     aa := axis
     aiQuaternionFromAxisAngle(&q, &aa, angle)
     return q
 }
 
-quat_from_euler_angles :: proc(x, y, z: f32) -> aiQuaternion {
+quat_from_euler_angles :: proc(x, y, z: ai_real) -> aiQuaternion {
     q: aiQuaternion
     aiQuaternionFromEulerAngles(&q, x, y, z)
     return q
@@ -466,7 +466,7 @@ quat_from_matrix3 :: proc(m: aiMatrix3x3) -> aiQuaternion {
     return q
 }
 
-quat_interpolate :: proc(a, b: aiQuaternion, t: f32) -> aiQuaternion {
+quat_interpolate :: proc(a, b: aiQuaternion, t: ai_real) -> aiQuaternion {
     dst: aiQuaternion
     aa, bb := a, b
     aiQuaternionInterpolate(&dst, &aa, &bb, t)

@@ -19,7 +19,7 @@ pub fn vec2Sub(a: aiVector2D, b: aiVector2D) aiVector2D {
     return dst;
 }
 
-pub fn vec2Scale(v: aiVector2D, s: f32) aiVector2D {
+pub fn vec2Scale(v: aiVector2D, s: ai_real) aiVector2D {
     var dst = v;
     c.aiVector2Scale(&dst, s);
     return dst;
@@ -37,15 +37,15 @@ pub fn vec2Normalize(v: aiVector2D) aiVector2D {
     return dst;
 }
 
-pub fn vec2Length(v: aiVector2D) f32 {
+pub fn vec2Length(v: aiVector2D) ai_real {
     return c.aiVector2Length(&v);
 }
 
-pub fn vec2LengthSquared(v: aiVector2D) f32 {
+pub fn vec2LengthSquared(v: aiVector2D) ai_real {
     return c.aiVector2SquareLength(&v);
 }
 
-pub fn vec2Dot(a: aiVector2D, b: aiVector2D) f32 {
+pub fn vec2Dot(a: aiVector2D, b: aiVector2D) ai_real {
     return c.aiVector2DotProduct(&a, &b);
 }
 
@@ -63,7 +63,7 @@ pub fn vec2SymMul(a: aiVector2D, b: aiVector2D) aiVector2D {
     return dst;
 }
 
-pub fn vec2DivScalar(v: aiVector2D, s: f32) aiVector2D {
+pub fn vec2DivScalar(v: aiVector2D, s: ai_real) aiVector2D {
     var dst = v;
     c.aiVector2DivideByScalar(&dst, s);
     return dst;
@@ -87,7 +87,7 @@ pub fn vec3Sub(a: aiVector3D, b: aiVector3D) aiVector3D {
     return dst;
 }
 
-pub fn vec3Scale(v: aiVector3D, s: f32) aiVector3D {
+pub fn vec3Scale(v: aiVector3D, s: ai_real) aiVector3D {
     var dst = v;
     c.aiVector3Scale(&dst, s);
     return dst;
@@ -117,15 +117,15 @@ pub fn vec3Cross(a: aiVector3D, b: aiVector3D) aiVector3D {
     return dst;
 }
 
-pub fn vec3Dot(a: aiVector3D, b: aiVector3D) f32 {
+pub fn vec3Dot(a: aiVector3D, b: aiVector3D) ai_real {
     return c.aiVector3DotProduct(&a, &b);
 }
 
-pub fn vec3Length(v: aiVector3D) f32 {
+pub fn vec3Length(v: aiVector3D) ai_real {
     return c.aiVector3Length(&v);
 }
 
-pub fn vec3LengthSquared(v: aiVector3D) f32 {
+pub fn vec3LengthSquared(v: aiVector3D) ai_real {
     return c.aiVector3SquareLength(&v);
 }
 
@@ -147,7 +147,7 @@ pub fn vec3SymMul(a: aiVector3D, b: aiVector3D) aiVector3D {
     return dst;
 }
 
-pub fn vec3DivScalar(v: aiVector3D, s: f32) aiVector3D {
+pub fn vec3DivScalar(v: aiVector3D, s: ai_real) aiVector3D {
     var dst = v;
     c.aiVector3DivideByScalar(&dst, s);
     return dst;
@@ -195,7 +195,7 @@ pub fn mat3Inverse(m: aiMatrix3x3) aiMatrix3x3 {
     return dst;
 }
 
-pub fn mat3Determinant(m: aiMatrix3x3) f32 {
+pub fn mat3Determinant(m: aiMatrix3x3) ai_real {
     return c.aiMatrix3Determinant(&m);
 }
 
@@ -225,13 +225,13 @@ pub fn mat3FromQuaternion(q: aiQuaternion) aiMatrix3x3 {
     return dst;
 }
 
-pub fn mat3RotationZ(angle: f32) aiMatrix3x3 {
+pub fn mat3RotationZ(angle: ai_real) aiMatrix3x3 {
     var m: aiMatrix3x3 = undefined;
     c.aiMatrix3RotationZ(&m, angle);
     return m;
 }
 
-pub fn mat3FromRotationAroundAxis(axis: aiVector3D, angle: f32) aiMatrix3x3 {
+pub fn mat3FromRotationAroundAxis(axis: aiVector3D, angle: ai_real) aiMatrix3x3 {
     var m: aiMatrix3x3 = undefined;
     c.aiMatrix3FromRotationAroundAxis(&m, &axis, angle);
     return m;
@@ -273,7 +273,7 @@ pub fn mat4Inverse(m: aiMatrix4x4) aiMatrix4x4 {
     return dst;
 }
 
-pub fn mat4Determinant(m: aiMatrix4x4) f32 {
+pub fn mat4Determinant(m: aiMatrix4x4) ai_real {
     return c.aiMatrix4Determinant(&m);
 }
 
@@ -307,31 +307,31 @@ pub fn mat4FromScalingRotationPosition(scaling: aiVector3D, rotation: aiQuaterni
     return dst;
 }
 
-pub fn mat4RotationX(angle: f32) aiMatrix4x4 {
+pub fn mat4RotationX(angle: ai_real) aiMatrix4x4 {
     var m: aiMatrix4x4 = undefined;
     c.aiMatrix4RotationX(&m, angle);
     return m;
 }
 
-pub fn mat4RotationY(angle: f32) aiMatrix4x4 {
+pub fn mat4RotationY(angle: ai_real) aiMatrix4x4 {
     var m: aiMatrix4x4 = undefined;
     c.aiMatrix4RotationY(&m, angle);
     return m;
 }
 
-pub fn mat4RotationZ(angle: f32) aiMatrix4x4 {
+pub fn mat4RotationZ(angle: ai_real) aiMatrix4x4 {
     var m: aiMatrix4x4 = undefined;
     c.aiMatrix4RotationZ(&m, angle);
     return m;
 }
 
-pub fn mat4FromRotationAroundAxis(axis: aiVector3D, angle: f32) aiMatrix4x4 {
+pub fn mat4FromRotationAroundAxis(axis: aiVector3D, angle: ai_real) aiMatrix4x4 {
     var m: aiMatrix4x4 = undefined;
     c.aiMatrix4FromRotationAroundAxis(&m, &axis, angle);
     return m;
 }
 
-pub fn mat4FromEulerAngles(x: f32, y: f32, z: f32) aiMatrix4x4 {
+pub fn mat4FromEulerAngles(x: ai_real, y: ai_real, z: ai_real) aiMatrix4x4 {
     var m: aiMatrix4x4 = undefined;
     c.aiMatrix4FromEulerAngles(&m, x, y, z);
     return m;
@@ -409,13 +409,13 @@ pub fn quatConjugate(q: aiQuaternion) aiQuaternion {
     return dst;
 }
 
-pub fn quatFromAxisAngle(axis: aiVector3D, angle: f32) aiQuaternion {
+pub fn quatFromAxisAngle(axis: aiVector3D, angle: ai_real) aiQuaternion {
     var q: aiQuaternion = undefined;
     c.aiQuaternionFromAxisAngle(&q, &axis, angle);
     return q;
 }
 
-pub fn quatFromEulerAngles(x: f32, y: f32, z: f32) aiQuaternion {
+pub fn quatFromEulerAngles(x: ai_real, y: ai_real, z: ai_real) aiQuaternion {
     var q: aiQuaternion = undefined;
     c.aiQuaternionFromEulerAngles(&q, x, y, z);
     return q;
@@ -427,7 +427,7 @@ pub fn quatFromMatrix3(m: aiMatrix3x3) aiQuaternion {
     return q;
 }
 
-pub fn quatInterpolate(a: aiQuaternion, b: aiQuaternion, t: f32) aiQuaternion {
+pub fn quatInterpolate(a: aiQuaternion, b: aiQuaternion, t: ai_real) aiQuaternion {
     var dst: aiQuaternion = undefined;
     c.aiQuaternionInterpolate(&dst, &a, &b, t);
     return dst;

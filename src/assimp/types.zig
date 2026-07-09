@@ -1,4 +1,4 @@
-pub const ai_real = f32;
+pub const ai_real = if (@hasDecl(@import("build_options"), "use_double_precision") and @import("build_options").use_double_precision) f64 else f32;
 pub const ai_int = c_int;
 pub const ai_uint = c_uint;
 pub const ai_int32 = i32;
@@ -17,10 +17,22 @@ pub const AI_MATH_TWO_PI_F: f32 = AI_MATH_PI_F * 2.0;
 pub const AI_MATH_HALF_PI_F: f32 = AI_MATH_PI_F * 0.5;
 
 pub inline fn AI_DEG_TO_RAD(x: anytype) ai_real {
-    return @as(ai_real, @floatCast(@as(f64, @floatCast(x)) * 0.0174532925));
+    const T = @TypeOf(x);
+    const val: f64 = switch (@typeInfo(T)) {
+        .comptime_float, .float, .vector => @as(f64, @floatCast(x)),
+        .comptime_int, .int => @as(f64, @floatFromInt(x)),
+        else => @compileError("AI_DEG_TO_RAD expects a numeric type"),
+    };
+    return @as(ai_real, @floatCast(val * 0.0174532925));
 }
 pub inline fn AI_RAD_TO_DEG(x: anytype) ai_real {
-    return @as(ai_real, @floatCast(@as(f64, @floatCast(x)) * 57.2957795));
+    const T = @TypeOf(x);
+    const val: f64 = switch (@typeInfo(T)) {
+        .comptime_float, .float, .vector => @as(f64, @floatCast(x)),
+        .comptime_int, .int => @as(f64, @floatFromInt(x)),
+        else => @compileError("AI_RAD_TO_DEG expects a numeric type"),
+    };
+    return @as(ai_real, @floatCast(val * 57.2957795));
 }
 
 pub const ai_epsilon: ai_real = 1e-6;
@@ -259,6 +271,7 @@ pub const aiPostProcessSteps = packed struct(u32) {
 };
 
 pub const aiComponent = packed struct(u32) {
+    _reserved_0: u1 = 0,
     normals: bool = false,
     tangents_and_bitangents: bool = false,
     colors: bool = false,
@@ -270,7 +283,7 @@ pub const aiComponent = packed struct(u32) {
     cameras: bool = false,
     meshes: bool = false,
     materials: bool = false,
-    _: u21 = 0,
+    _reserved_1: u20 = 0,
 };
 
 pub const aiProcessPreset_TargetRealtime_Fast: c_uint = @bitCast(aiPostProcessSteps{

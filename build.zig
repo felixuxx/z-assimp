@@ -141,9 +141,13 @@ pub fn build(b: *std.Build) !void {
 
     b.installArtifact(lib);
 
+    const assimp_options = b.addOptions();
+    assimp_options.addOption(bool, "use_double_precision", use_double_precision);
+
     const assimp_mod = b.addModule("assimp", .{
         .root_source_file = b.path("src/assimp/assimp.zig"),
     });
+    assimp_mod.addOptions("build_options", assimp_options);
 
     const example_cpp = b.addExecutable(.{
         .name = "static-example-cpp",
